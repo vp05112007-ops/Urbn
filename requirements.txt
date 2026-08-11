@@ -52,3 +52,4 @@ dj-database-url==2.1.0
 psycopg[binary]
 whitenoise==6.6.0
 gunicorn==21.2.0
+uvicorn[standard]
