@@ -105,7 +105,11 @@ def create_razorpay_order(request):
 
         first_name = data.get('first_name') or (address.full_name.split()[0] if address else request.user.first_name)
         last_name = data.get('last_name') or (' '.join(address.full_name.split()[1:]) if address and len(address.full_name.split()) > 1 else request.user.last_name)
-        phone = data.get('phone') or (address.phone if address else (request.user.profile.phone if hasattr(request.user, 'profile') else ''))
+
+        phone = data.get('phone', '').strip()
+        import re
+        if not phone or not re.match(r'^[6-9]\d{9}$', phone):
+            return JsonResponse({'error': 'A valid 10-digit Indian phone number is required.'}, status=400)
         
         # Create Pending Order
         order = Order.objects.create(

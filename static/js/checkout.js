@@ -34,6 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const phoneInput = form.querySelector('input[name="phone"]');
+        const phoneVal = phoneInput ? phoneInput.value.trim() : '';
+        const phoneRegex = /^[6-9]\d{9}$/;
+        if (!phoneRegex.test(phoneVal)) {
+            showError("Please enter a valid 10-digit Indian phone number.");
+            return;
+        }
+
         payBtn.disabled = true;
         payBtn.textContent = 'PROCESSING...';
         errorDiv.style.display = 'none';
