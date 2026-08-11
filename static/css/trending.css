@@ -96,3 +96,12 @@
         padding-bottom: 60px;
     }
 }
+
+@media (max-width: 480px) {
+    .trending-page .trending-hero h1 {
+        font-size: 32px;
+    }
+    .trending-page .trending-hero p {
+        font-size: 14px;
+    }
+}

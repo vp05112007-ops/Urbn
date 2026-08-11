@@ -343,11 +343,49 @@ function checkWishlistState() {
 
 function setupMobileMenu() {
     const toggle = document.querySelector('.mobile-menu-toggle');
-    // For now just a simple alert or console log as a placeholder for a mobile menu implementation
-    if (toggle) {
-        toggle.addEventListener('click', () => {
-            console.log("Mobile menu toggled");
-            // Mobile menu logic can be expanded here
+    const navCenter = document.querySelector('.nav-center');
+    
+    if (toggle && navCenter) {
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navCenter.classList.toggle('mobile-active');
+            toggle.classList.toggle('active');
+            
+            if (navCenter.classList.contains('mobile-active')) {
+                document.body.classList.add('no-scroll');
+                // Change hamburger icon to X
+                toggle.innerHTML = '&times;';
+                toggle.style.fontSize = '32px';
+            } else {
+                document.body.classList.remove('no-scroll');
+                // Change back to hamburger
+                toggle.innerHTML = '&#9776;';
+                toggle.style.fontSize = '24px';
+            }
+        });
+
+        // Close when clicking a link
+        const links = navCenter.querySelectorAll('a');
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                navCenter.classList.remove('mobile-active');
+                toggle.classList.remove('active');
+                document.body.classList.remove('no-scroll');
+                toggle.innerHTML = '&#9776;';
+                toggle.style.fontSize = '24px';
+            });
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+            if (navCenter.classList.contains('mobile-active') && !navCenter.contains(e.target) && e.target !== toggle) {
+                navCenter.classList.remove('mobile-active');
+                toggle.classList.remove('active');
+                document.body.classList.remove('no-scroll');
+                toggle.innerHTML = '&#9776;';
+                toggle.style.fontSize = '24px';
+            }
         });
     }
 }
+

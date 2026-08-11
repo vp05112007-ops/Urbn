@@ -296,3 +296,26 @@ section {
         transform: translateY(0);
     }
 }
+
+@media (max-width: 480px) {
+    .hero {
+        padding: 60px 5% 40px 5%;
+    }
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    .hero-visual {
+        min-height: 300px;
+        margin-top: 20px;
+    }
+    .product-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .collection-item {
+        height: 300px;
+    }
+    .section-title {
+        font-size: 2rem;
+    }
+}

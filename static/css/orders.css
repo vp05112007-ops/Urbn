@@ -464,3 +464,14 @@
     .item-row .item-image { margin: 0 auto 16px; }
     .item-qty, .item-price { width: 100%; text-align: center; margin-top: 8px; }
 }
+
+@media (max-width: 480px) {
+    .orders-header h1 {
+        font-size: 24px;
+    }
+    .order-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}

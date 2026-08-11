@@ -31,16 +31,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
         
-        const scale = Math.max(
+        let scale = Math.max(
             viewportWidth / img.naturalWidth,
             viewportHeight / img.naturalHeight
         );
+
+        // On mobile portrait screens, scale up to hide the black bottom half of the image
+        // and make the 3D hoodie animation cover the entire screen area.
+        if (viewportWidth < 768 && viewportHeight > viewportWidth) {
+            scale *= 2.2; // Zoom in to make animation fill the screen
+        }
 
         const drawWidth = img.naturalWidth * scale;
         const drawHeight = img.naturalHeight * scale;
 
         const offsetX = (viewportWidth - drawWidth) / 2;
-        const offsetY = (viewportHeight - drawHeight) / 2;
+        
+        let offsetY = (viewportHeight - drawHeight) / 2;
+        if (viewportWidth < 768 && viewportHeight > viewportWidth) {
+            // Align to the top of the image so the texture covers the screen
+            // The black bottom half will overflow and be hidden
+            offsetY = 0;
+        }
 
         // Scale by DPR before drawing since context is scaled
         context.drawImage(

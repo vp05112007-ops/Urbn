@@ -159,3 +159,15 @@
         font-size: 40px;
     }
 }
+
+@media (max-width: 480px) {
+    .banner-content h2 {
+        font-size: 28px;
+    }
+    .banner-content p {
+        font-size: 16px;
+    }
+    .collection-info h3 {
+        font-size: 24px;
+    }
+}

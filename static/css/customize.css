@@ -246,3 +246,16 @@
         min-height: 50vh;
     }
 }
+
+@media (max-width: 480px) {
+    .customize-preview {
+        min-height: 40vh;
+    }
+    .text-customizer input {
+        font-size: 14px;
+        padding: 10px;
+    }
+    .custom-section h3 {
+        font-size: 16px;
+    }
+}

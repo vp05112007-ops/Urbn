@@ -224,3 +224,12 @@
         padding: 24px;
     }
 }
+
+@media (max-width: 480px) {
+    .shipping-section, .summary-section {
+        padding: 16px;
+    }
+    .checkout-header h1 {
+        font-size: 24px;
+    }
+}

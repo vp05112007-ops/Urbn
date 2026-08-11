@@ -237,6 +237,27 @@
         .badge-warning { background: rgba(241, 196, 15, 0.1); color: #f1c40f; }
         .badge-danger { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
         .badge-info { background: rgba(52, 152, 219, 0.1); color: #3498db; }
+        @media (max-width: 992px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .stat-grid, .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .data-table-container {
+                overflow-x: auto;
+            }
+        }
         
         {% block extra_css %}{% endblock %}
     </style>
@@ -263,7 +284,7 @@
         </nav>
         <div class="sidebar-footer" style="padding-top: 16px; border-top: 1px solid var(--border);">
             <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">{{ request.user.email }}</div>
-            <a href="{% url 'logout_session' %}" class="nav-item" style="color: #e74c3c;">Logout</a>
+            <a href="{% url 'account_logout' %}" class="nav-item" style="color: #e74c3c;">Logout</a>
             <a href="{% url 'home' %}" style="display: block; margin-top: 16px; color: var(--text-muted); text-decoration: none;">&larr; Back to Store</a>
         </div>
     </aside>

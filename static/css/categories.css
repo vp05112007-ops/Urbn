@@ -688,3 +688,36 @@
     width: 18px;
     height: 18px;
 }
+
+@media (max-width: 991px) {
+    .catalog-layout {
+        grid-template-columns: 1fr;
+    }
+    .filters-sidebar {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 15px;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .filters-sidebar .filter-group {
+        margin-bottom: 0;
+        min-width: max-content;
+    }
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+    .catalog-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

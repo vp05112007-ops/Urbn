@@ -775,3 +775,100 @@ body.no-scroll {
 .highlight-new {
     animation: highlightNew 0.5s ease-out forwards;
 }
+
+/* ========================================= */
+/* MOBILE RESPONSIVENESS (max-width: 991px)  */
+/* ========================================= */
+@media (max-width: 991px) {
+    /* Prevent horizontal scroll globally */
+    body, html {
+        overflow-x: hidden;
+        width: 100%;
+    }
+    
+    body.no-scroll {
+        overflow: hidden;
+    }
+
+    /* Typography Scaling */
+    h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+    h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+    h3 { font-size: clamp(1.25rem, 3vw, 1.75rem); }
+    
+    /* Navbar styling */
+    .mobile-menu-toggle {
+        display: block !important;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 1001;
+        margin-left: 15px;
+    }
+
+    .nav-center {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        max-width: 300px;
+        height: 100vh;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: right 0.3s ease-in-out;
+        z-index: 1000;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 2rem;
+    }
+
+    .nav-center.mobile-active {
+        right: 0;
+    }
+
+    .nav-center a {
+        font-size: 1.5rem;
+        margin: 15px 0;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+    }
+
+    .nav-center.mobile-active a {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .nav-right {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Cart Drawer Mobile */
+    .cart-drawer {
+        width: 95vw !important;
+        max-width: 400px;
+    }
+
+    .search-container {
+        width: 95%;
+        padding: 2rem 1rem;
+    }
+
+    .search-input {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-left {
+        font-size: 1.25rem; /* Smaller logo */
+    }
+    
+    .nav-right a, .nav-right .cart-count-wrapper {
+        font-size: 0.85rem;
+        padding: 5px;
+    }
+}

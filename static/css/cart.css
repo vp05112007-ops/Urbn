@@ -315,3 +315,15 @@
         margin-top: 24px;
     }
 }
+
+@media (max-width: 480px) {
+    .cart-header h1 {
+        font-size: 24px;
+    }
+    .item-image {
+        height: 150px;
+    }
+    .cart-summary {
+        padding: 16px;
+    }
+}

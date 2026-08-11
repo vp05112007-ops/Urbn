@@ -406,3 +406,20 @@ canvas {
     0% { opacity: 0.4; transform: scale(0.9); }
     100% { opacity: 0.8; transform: scale(1.2); }
 }
+
+@media (max-width: 480px) {
+    .headline-container { height: 120px; }
+    .hl-group { font-size: clamp(2rem, 8vw, 3rem); letter-spacing: 2px; }
+    #intro-images-block {
+        top: 45%;
+        height: 45vh;
+    }
+    .img-1 { width: 140px; height: 180px; }
+    .img-2 { width: 120px; height: 160px; }
+    .img-3 { width: 130px; height: 150px; }
+    .intro-subtext { font-size: 0.9rem; }
+    .intro-cta-btn {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+    }
+}
