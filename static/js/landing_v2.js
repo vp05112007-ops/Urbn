@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const img = new Image();
             img.decoding = "async";
             // Notice: Path adjusted for running from templates/landing.html
-            img.src = `../enhance/frame_${i}.png`;
+            img.src = `/static/enhance/frame_${i}.png`;
             images.push(img);
             
             const decodePromise = img.decode().catch(e => {
