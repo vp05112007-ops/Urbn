@@ -9,6 +9,7 @@ services:
     name: urbn-web
     env: python
     buildCommand: "./build.sh"
+    preDeployCommand: "python manage.py migrate"
     startCommand: "python -m gunicorn urbn_project.asgi:application -k uvicorn.workers.UvicornWorker"
     envVars:
       - key: DATABASE_URL
