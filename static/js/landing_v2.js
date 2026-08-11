@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const frameCount = 240;
     const images = [];
+    const loadingFrames = new Set();
+    const staticBase = window.STATIC_BASE_URL || "/static/enhance/";
     let currentFrame = -1;
     let targetFrame = 0;
     let currentFrameFloat = 0;
@@ -64,34 +66,68 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     }
 
-    // Preload all images
-    async function preloadImages() {
-        const promises = [];
-        for (let i = 1; i <= frameCount; i++) {
-            const img = new Image();
-            img.decoding = "async";
-            // Notice: Path adjusted for running from templates/landing.html
-            img.src = `/static/enhance/frame_${i}.png`;
-            images.push(img);
-            
-            const decodePromise = img.decode().catch(e => {
-                // Ignore decode errors
-            });
-            promises.push(decodePromise);
+    function getFrameUrl(index) {
+        return `${staticBase}frame_${index + 1}.png`;
+    }
 
-            if (i === 1) {
-                decodePromise.then(() => {
-                    resizeCanvas();
-                    drawFrame(0);
-                });
+    function loadFrame(index) {
+        if (index < 0 || index >= frameCount || images[index] || loadingFrames.has(index)) {
+            return;
+        }
+        loadingFrames.add(index);
+        
+        const img = new Image();
+        img.decoding = "async";
+        img.onload = () => {
+            images[index] = img;
+            loadingFrames.delete(index);
+            // Draw immediately if this is the frame the user is waiting for
+            if (currentFrame === index) {
+                drawFrame(index);
+            }
+        };
+        img.onerror = () => {
+            loadingFrames.delete(index);
+        };
+        img.src = getFrameUrl(index);
+    }
+
+    // 1. Load frame 1 immediately
+    loadFrame(0);
+
+    const checkInitialLoad = setInterval(() => {
+        if (images[0]) {
+            clearInterval(checkInitialLoad);
+            resizeCanvas();
+            drawFrame(0);
+            startIdlePreloader();
+        }
+    }, 50);
+
+    // 4. Prioritize frames near current scroll
+    function prioritizeFrames(target) {
+        const radius = 8;
+        const start = Math.max(0, target - radius);
+        const end = Math.min(frameCount - 1, target + radius);
+        for (let i = start; i <= end; i++) {
+            loadFrame(i);
+        }
+    }
+
+    // Background preloader for remaining frames
+    function startIdlePreloader() {
+        let i = 1;
+        function loadNext() {
+            if (i < frameCount) {
+                if (!images[i] && !loadingFrames.has(i)) {
+                    loadFrame(i);
+                }
+                i++;
+                setTimeout(loadNext, 15);
             }
         }
-        
-        // Wait for all images to finish decoding in parallel
-        await Promise.all(promises);
+        setTimeout(loadNext, 500); // Wait for initial render
     }
-    
-    preloadImages();
 
     function render() {
         ticking = false;
@@ -304,7 +340,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const nextFrame = Math.min(frameCount - 1, Math.max(0, Math.round(currentFrameFloat)));
         if (nextFrame !== currentFrame) {
             currentFrame = nextFrame;
-            drawFrame(currentFrame);
+
+            // Prioritize dynamically loading frames near current position
+            prioritizeFrames(currentFrame);
+
+            if (images[currentFrame]) {
+                drawFrame(currentFrame);
+            }
+            // If frame isn't loaded yet, drawFrame is skipped and canvas retains
+            // previous frame, acting as a smooth visual fallback state.
         }
         requestAnimationFrame(smoothLoop);
     }

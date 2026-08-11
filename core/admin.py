@@ -164,3 +164,33 @@ class ReturnRequestAdmin(admin.ModelAdmin):
             obj.status = 'COMPLETED'
             obj.save()
             self.save_model(request, obj, None, True)
+
+# --- Catalog Models Admin ---
+
+from .models import Product, Category, Collection, ProductImage
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'is_active', 'created_at')
+    search_fields = ('name', 'slug')
+
+@admin.register(Collection)
+class CollectionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'is_active', 'display_order', 'created_at')
+    search_fields = ('name', 'slug')
+
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 1
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('name', 'sku', 'price', 'category', 'is_active', 'is_featured')
+    list_filter = ('is_active', 'is_archived', 'is_featured', 'is_trending', 'is_new_arrival', 'category', 'collection')
+    search_fields = ('name', 'sku', 'description')
+    inlines = [ProductImageInline]
+
+@admin.register(ProductImage)
+class ProductImageAdmin(admin.ModelAdmin):
+    list_display = ('product', 'is_primary', 'display_order')
+    search_fields = ('product__name',)
