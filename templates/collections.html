@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URBN | Collections</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/collections.css' %}">
+</head>
+<body class="inner-page">
+
+    {% include 'partials/navbar.html' %}
+
+
+
+    <main class="collections-container page-content">
+        <header class="collections-header">
+            <h1 class="reveal-on-scroll">OUR COLLECTIONS</h1>
+            <p class="reveal-on-scroll delay-1">Curated concepts designed for different aspects of the everyday.</p>
+        </header>
+        
+        {% for c in collections %}
+        {% if forloop.counter == 2 %}
+        <!-- Banner Style for 2nd collection -->
+        <div class="collection-banner reveal-on-scroll" style="background: linear-gradient(0deg, rgba(0,0,0,0.7), rgba(0,0,0,0.3)){% if c.cover_image %}, url('{{ c.cover_image.url }}') center/cover no-repeat{% else %}, #1a1a1a{% endif %};">
+            <div class="banner-content">
+                <h2>{{ c.name|upper }}</h2>
+                <p>{{ c.description }}</p>
+                <a href="{% url 'categories' %}?collection={{ c.slug }}" class="btn-secondary">SHOP COLLECTION</a>
+            </div>
+        </div>
+        {% else %}
+        <!-- Block Style for other collections -->
+        <div class="collection-block {% if forloop.counter|divisibleby:2 %}reverse{% endif %} reveal-on-scroll">
+            <div class="collection-visual" style="background: #111;">
+                {% if c.cover_image %}
+                <img src="{{ c.cover_image.url }}" alt="{{ c.name }}" style="width:100%; height:100%; object-fit:cover;">
+                {% endif %}
+            </div>
+            <div class="collection-info">
+                <h2>{{ c.name|upper }}</h2>
+                <p>{{ c.description }}</p>
+                <a href="{% url 'categories' %}?collection={{ c.slug }}" class="explore-btn">EXPLORE COLLECTION <span>&rarr;</span></a>
+            </div>
+        </div>
+        {% endif %}
+        {% empty %}
+        <p>No collections found.</p>
+        {% endfor %}
+
+    </main>
+
+    <script src="{% static 'js/global.js' %}"></script>
+    <script src="{% static 'js/collections.js' %}"></script>
+    {% include 'partials/cart_drawer.html' %}
+</body>
+</html>

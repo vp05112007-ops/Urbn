@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URBN | Premium Streetwear</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+
+    <nav class="global-nav landing-nav">
+        <a href="{% url 'home' %}" class="nav-left">URBN</a>
+        <div class="nav-center">
+            <a href="{% url 'home' %}">SHOP</a>
+            <a href="{% url 'collections' %}">COLLECTIONS</a>
+            <a href="{% url 'collections' %}">LOOKBOOK</a>
+            <a href="{% url 'home' %}">ABOUT</a>
+        </div>
+        <div class="nav-right">
+            <a href="javascript:void(0)" class="trigger-search">SEARCH</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}">WISHLIST</a>
+            {% else %}
+                <a href="{% url 'account_login' %}">LOGIN</a>
+            {% endif %}
+            <a href="{% url 'cart' %}" class="cart-count-wrapper">BAG <span class="cart-count">0</span></a>
+            <div class="mobile-menu-toggle">&#9776;</div>
+        </div>
+    </nav>
+
+    <!-- Search Overlay -->
+    <div id="search-overlay">
+        <div class="close-search">&times;</div>
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search products...">
+            <div class="trending-searches">
+                <h4>TRENDING SEARCHES</h4>
+                <div class="search-tags">
+                    <span class="search-tag">Hoodies</span>
+                    <span class="search-tag">Oversized T-Shirts</span>
+                    <span class="search-tag">Jackets</span>
+                    <span class="search-tag">Cargo Pants</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <!-- SECTION 1 -->
+        <section class="hero-animation-section">
+            <div class="hero-animation-sticky">
+                <div id="story-container">
+                    <!-- PHASE 1: 0% to 15% -->
+                    <div class="story-phase right" id="phase-1">
+                        <h2>BUILT FOR THE EVERYDAY.</h2>
+                        <p>Premium streetwear without the ordinary.</p>
+                        <div class="sub-text">SCROLL TO DISCOVER &darr;</div>
+                    </div>
+
+                    <!-- PHASE 2: 15% to 30% -->
+                    <div class="story-phase right-lower" id="phase-2">
+                        <h2>MORE THAN A HOODIE.</h2>
+                        <p>Designed with intention. Built for movement.</p>
+                    </div>
+
+                    <!-- PHASE 3: 30% to 50% -->
+                    <div class="story-phase left" id="phase-3">
+                        <h2>MADE TO MOVE.</h2>
+                        <p>Relaxed fit. Heavyweight comfort. Everyday attitude.</p>
+                    </div>
+
+                    <!-- PHASE 4: 50% to 65% -->
+                    <div class="story-phase left" id="phase-4">
+                        <div class="spec-block">
+                            <div class="spec-item">420 GSM<span class="spec-item-sub">COTTON FLEECE</span></div>
+                            <div class="spec-divider"></div>
+                            <div class="spec-item">HEAVYWEIGHT<span class="spec-item-sub">OVERSIZED FIT</span></div>
+                        </div>
+                    </div>
+
+                    <!-- PHASE 5: 65% to 82% -->
+                    <div class="story-phase left" id="phase-5">
+                        <h2>CRAFTED FOR COMFORT.</h2>
+                        <p>Built from heavyweight cotton fleece for a structured feel that lasts.</p>
+                    </div>
+
+                    <!-- PHASE 6: 82% to 100% -->
+                    <div class="story-phase left" id="phase-6">
+                        <h2>YOUR EVERYDAY ESSENTIAL.</h2>
+                        <p>Premium streetwear designed to move with you.</p>
+                    </div>
+                </div>
+
+                <div id="animation-stage">
+                    <canvas id="hoodie-canvas"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2 -->
+        <section class="story-section" id="story-section">
+            <div class="story-viewport">
+                <!-- Ambient Background Elements -->
+                <div class="ambient-bg"></div>
+                <div class="glow-orb orb-1"></div>
+                <div class="glow-orb orb-2"></div>
+                <div class="glow-orb orb-3"></div>
+
+                <div class="intro-left" id="intro-text-block">
+                    <h2 class="intro-brand">URBN</h2>
+                    <div class="headline-container">
+                        <div class="hl-group" id="hl-1">
+                            <h3 class="intro-headline">BUILT FOR<br>THE WAY YOU MOVE.</h3>
+                            <p class="intro-desc">Premium streetwear designed around<br>comfort, movement and everyday attitude.</p>
+                        </div>
+                        <div class="hl-group" id="hl-2">
+                            <h3 class="intro-headline">MORE THAN<br>A HOODIE.</h3>
+                        </div>
+                        <div class="hl-group" id="hl-3">
+                            <h3 class="intro-headline">MADE TO<br>MOVE.</h3>
+                        </div>
+                        <div class="hl-group" id="hl-4">
+                            <h3 class="intro-headline">CRAFTED FOR<br>COMFORT.</h3>
+                        </div>
+                        <div class="hl-group" id="hl-5">
+                            <h3 class="intro-headline" style="font-size: 28px; margin-bottom: 12px; background: none; -webkit-text-fill-color: var(--text-primary); text-shadow: none;">VISIT US</h3>
+                            <p class="intro-desc" style="font-size: 16px; margin-bottom: 32px;">URBN Flagship Store<br>123 Fashion Avenue<br>New York, NY 10012</p>
+                            <h3 class="intro-headline" style="font-size: 28px; margin-bottom: 12px; background: none; -webkit-text-fill-color: var(--text-primary); text-shadow: none;">CONTACT</h3>
+                            <p class="intro-desc" style="font-size: 16px;">hello@urbnstreetwear.com<br>+1 (555) 123-4567</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="intro-images" id="intro-images-block">
+                    <img src="{% static 'img/intro_fabric_1786211091423.png' %}" class="intro-img img-1" id="intro-img-1" alt="Fabric">
+                    <img src="{% static 'img/intro_outfit_1786211102850.png' %}" class="intro-img img-2" id="intro-img-2" alt="Outfit">
+                    <img src="{% static 'img/intro_folded_1786211116762.png' %}" class="intro-img img-3" id="intro-img-3" alt="Folded">
+                </div>
+
+                <div class="intro-right" id="intro-cta-block">
+                    <h2 class="intro-cta-headline">YOUR STYLE.<br>YOUR WAY.</h2>
+                    <p class="intro-cta-desc">Discover the latest<br>URBN collection.</p>
+                    <a href="{% url 'home' %}" class="intro-cta-btn">SHOP NOW <span class="cta-arrow">&rarr;</span></a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="{% static 'js/global.js' %}"></script>
+    <script src="{% static 'js/landing.js' %}"></script>
+</body>
+</html>

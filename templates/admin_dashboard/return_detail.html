@@ -1,0 +1,346 @@
+{% extends "admin_dashboard/base_admin.html" %}
+{% load static %}
+
+{% block title %}Admin - Review {{ return_req.request_number }}{% endblock %}
+
+{% block content %}
+<div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+        <h2 style="margin: 0 0 8px 0;">RETURN / REFUND REVIEW</h2>
+        <h3 style="margin: 0; font-size: 1.2rem; color: var(--text-color);">Request #{{ return_req.request_number }}</h3>
+        <p style="color: var(--text-muted); margin-top: 8px; font-size: 0.9rem;">
+            Created: {{ return_req.created_at|date:"d M Y, h:i A" }} | 
+            Type: <strong>{{ return_req.get_request_type_display|upper }}</strong>
+        </p>
+    </div>
+    <div>
+        <span class="badge {% if return_req.status == 'COMPLETED' or return_req.status == 'REFUNDED' %}badge-success{% elif return_req.status == 'REJECTED' or return_req.status == 'CANCELLED' %}badge-danger{% else %}badge-warning{% endif %}" style="font-size: 1rem; padding: 8px 16px;">
+            {{ return_req.get_status_display|upper }}
+        </span>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    
+    <!-- LEFT COLUMN -->
+    <div>
+        <!-- Customer Info -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">CUSTOMER INFORMATION</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Name</p>
+                    <p style="font-weight: 500; margin: 0;">{{ return_req.user.first_name }} {{ return_req.user.last_name }}</p>
+                </div>
+                <div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Email</p>
+                    <p style="font-weight: 500; margin: 0;">{{ return_req.user.email }}</p>
+                </div>
+                <div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Phone</p>
+                    <p style="font-weight: 500; margin: 0;">{{ return_req.order.phone|default:"N/A" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Info -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">ORDER INFORMATION</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Order Number</p>
+                    <p style="font-weight: 500; margin: 0;"><a href="{% url 'admin_order_detail' return_req.order.order_number %}" style="color: var(--primary-color);">#{{ return_req.order.order_number }}</a></p>
+                </div>
+                <div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Order Date</p>
+                    <p style="font-weight: 500; margin: 0;">{{ return_req.order.created_at|date:"d M Y" }}</p>
+                </div>
+                <div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Payment Status</p>
+                    <p style="font-weight: 500; margin: 0;">{{ return_req.order.get_payment_status_display }}</p>
+                </div>
+                <div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Total Order Amount</p>
+                    <p style="font-weight: 500; margin: 0;">₹{{ return_req.order.total_amount|floatformat:"2" }}</p>
+                </div>
+                {% if return_req.order.razorpay_payment_id %}
+                <div style="grid-column: 1 / -1;">
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Payment ID</p>
+                    <p style="font-family: monospace; font-size: 0.9rem; margin: 0;">{{ return_req.order.razorpay_payment_id }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">PRODUCT INFORMATION</h3>
+            <div style="display: flex; gap: 16px;">
+                {% if return_req.order_item.product_image_snapshot %}
+                <img src="{{ return_req.order_item.product_image_snapshot }}" alt="Product" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border);">
+                {% else %}
+                <div style="width: 100px; height: 100px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid var(--border);">No Img</div>
+                {% endif %}
+                <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div style="grid-column: 1 / -1;">
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Product Name (Snapshot)</p>
+                        <p style="font-weight: bold; margin: 0;">{{ return_req.order_item.product_name_snapshot }}</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">SKU / Product ID</p>
+                        <p style="font-family: monospace; margin: 0;">{{ return_req.order_item.product_id }}</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Unit Price</p>
+                        <p style="margin: 0;">₹{{ return_req.order_item.unit_price|floatformat:"2" }}</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Size / Color</p>
+                        <p style="margin: 0;">{{ return_req.order_item.size|default:"-" }} / {{ return_req.order_item.color|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Requested Quantity</p>
+                        <p style="margin: 0;">{{ return_req.requested_quantity }} of {{ return_req.order_item.quantity }}</p>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Item Total (Requested)</p>
+                        <p style="font-weight: bold; margin: 0; color: var(--primary-color);">₹{% widthratio return_req.order_item.unit_price 1 return_req.requested_quantity %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Request Details -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">REQUEST DETAILS</h3>
+            <div style="margin-bottom: 16px;">
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Reason</p>
+                <p style="font-weight: bold; margin: 0;">{{ return_req.reason }}</p>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Description</p>
+                <p style="margin: 0; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 4px; border: 1px solid var(--border);">
+                    {{ return_req.description|linebreaksbr }}
+                </p>
+            </div>
+            
+            {% if return_req.request_type == 'EXCHANGE' %}
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
+                <h4 style="margin: 0 0 12px 0;">EXCHANGE INFORMATION</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div style="padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 4px;">
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0 0 4px 0;">CURRENT VARIANT</p>
+                        <p style="margin: 0;"><strong>Size:</strong> {{ return_req.order_item.size|default:"-" }}</p>
+                        <p style="margin: 0;"><strong>Color:</strong> {{ return_req.order_item.color|default:"-" }}</p>
+                    </div>
+                    <div style="padding: 12px; background: rgba(52, 152, 219, 0.1); border: 1px solid #3498db; border-radius: 4px;">
+                        <p style="color: #3498db; font-size: 0.8rem; font-weight: bold; margin: 0 0 4px 0;">REQUESTED EXCHANGE</p>
+                        <p style="margin: 0;"><strong>Size:</strong> {{ return_req.requested_exchange_size|default:"-" }}</p>
+                        <p style="margin: 0;"><strong>Color:</strong> {{ return_req.requested_exchange_color|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if return_req.request_type == 'REPLACEMENT' %}
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
+                <h4 style="margin: 0 0 12px 0;">REPLACEMENT INFORMATION</h4>
+                <div style="padding: 12px; background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; border-radius: 4px;">
+                    <p style="color: #f59e0b; font-size: 0.8rem; font-weight: bold; margin: 0 0 4px 0;">REPLACEMENT REASON</p>
+                    <p style="margin: 0;">{{ return_req.reason }}</p>
+                    <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: var(--text-muted);">Ensure evidence images clearly show the defect or issue before approving replacement.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Defect / Evidence Images -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="margin: 0 0 4px 0;">PRODUCT EVIDENCE</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0 0 16px 0; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Photos uploaded by the customer</p>
+            
+            {% if return_req.images.all %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px;">
+                {% for img in return_req.images.all %}
+                <img src="{{ img.image.url }}" alt="Evidence" class="evidence-img" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); cursor: pointer;" onclick="openLightbox(this.src)">
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="padding: 24px; text-align: center; background: rgba(255,255,255,0.02); border-radius: 4px; border: 1px dashed var(--border);">
+                <h4 style="margin: 0 0 8px 0;">NO EVIDENCE IMAGES</h4>
+                <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">Customer did not upload any images with this request.</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+        <!-- Refund Information -->
+        {% if return_req.request_type == 'RETURN' %}
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">REFUND INFORMATION</h3>
+            
+            <div style="margin-bottom: 12px;">
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Original Payment</p>
+                <p style="font-weight: bold; margin: 0;">₹{{ return_req.order.total_amount|floatformat:"2" }}</p>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Eligible Refund</p>
+                <p style="font-weight: bold; margin: 0; font-size: 1.2rem; color: #3498db;">₹{% widthratio return_req.order_item.unit_price 1 return_req.requested_quantity %}</p>
+            </div>
+            
+            {% if return_req.refund %}
+                <div style="margin-bottom: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Refund Status</p>
+                    <p style="font-weight: bold; margin: 0;">
+                        <span style="color: {% if return_req.refund.status == 'COMPLETED' or return_req.refund.status == 'PROCESSED' %}#22c55e{% elif return_req.refund.status == 'REJECTED' %}#ef4444{% else %}#f59e0b{% endif %};">{{ return_req.refund.status }}</span>
+                    </p>
+                </div>
+                {% if return_req.refund.razorpay_refund_id %}
+                <div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Razorpay Refund ID</p>
+                    <p style="font-family: monospace; font-size: 0.85rem; margin: 0;">{{ return_req.refund.razorpay_refund_id }}</p>
+                </div>
+                {% endif %}
+            {% else %}
+                <div style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.05); text-align: center; border-radius: 4px;">
+                    <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">NOT PROCESSED</p>
+                </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Admin Decision / Actions -->
+        <div class="card" style="margin-bottom: 24px; border: 1px solid var(--primary-color);">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; color: var(--primary-color);">ADMIN DECISION</h3>
+            
+            {% if return_req.status == 'REQUESTED' or return_req.status == 'UNDER_REVIEW' %}
+                <form method="POST" style="margin-bottom: 16px;" onsubmit="return confirm('Approve this return/refund request?');">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="APPROVE" class="btn btn-success" style="width: 100%; padding: 12px; font-weight: bold; margin-bottom: 12px;">APPROVE REQUEST</button>
+                </form>
+                
+                <form method="POST" style="padding-top: 16px; border-top: 1px solid var(--border);">
+                    {% csrf_token %}
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label style="display: block; margin-bottom: 4px; font-size: 0.9rem; color: var(--text-muted);">REJECTION REASON (Required)</label>
+                        <textarea name="rejection_reason" class="form-input" rows="3" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-color);"></textarea>
+                    </div>
+                    <button type="submit" name="action" value="REJECT" class="btn btn-danger" style="width: 100%; padding: 12px; font-weight: bold;" onclick="return confirm('Reject this request?');">REJECT REQUEST</button>
+                </form>
+
+            {% elif return_req.status == 'APPROVED' and return_req.request_type == 'RETURN' %}
+                <div style="padding: 16px; background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; border-radius: 4px; margin-bottom: 16px;">
+                    <p style="margin: 0; color: #22c55e; font-weight: bold; text-align: center;">REQUEST APPROVED</p>
+                </div>
+                
+                <form method="POST" action="{% url 'admin_process_refund' return_req.request_number %}" onsubmit="return confirm('Are you sure you want to process this refund via Razorpay?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(255,255,255,0.1);">PROCESS REFUND (RAZORPAY)</button>
+                    <p style="margin: 8px 0 0 0; font-size: 0.8rem; color: var(--text-muted); text-align: center;">This will issue a real refund to the customer.</p>
+                </form>
+                
+            {% elif return_req.status == 'REJECTED' %}
+                <div style="padding: 16px; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 4px; margin-bottom: 16px;">
+                    <p style="margin: 0; color: #ef4444; font-weight: bold; text-align: center; margin-bottom: 8px;">REQUEST REJECTED</p>
+                    <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);"><strong>Reason:</strong> {{ return_req.rejection_reason }}</p>
+                </div>
+            {% else %}
+                <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 4px; text-align: center;">
+                    <p style="margin: 0; color: var(--text-muted);">No primary actions available for status: <strong>{{ return_req.get_status_display }}</strong></p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Status Update -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">UPDATE STATUS</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="UPDATE_STATUS">
+                <div style="display: flex; gap: 8px;">
+                    <select name="status" class="form-select" style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-color);">
+                        {% for code, name in status_choices %}
+                            <option value="{{ code }}" {% if return_req.status == code %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-secondary" style="padding: 8px 16px;">Update</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Admin Notes -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">ADMIN NOTES</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="SAVE_NOTE">
+                <textarea name="admin_notes" rows="4" class="form-input" placeholder="Add internal notes about this request..." style="width: 100%; padding: 12px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-color); margin-bottom: 12px;">{{ return_req.admin_notes|default:"" }}</textarea>
+                <button type="submit" class="btn btn-secondary" style="width: 100%; padding: 10px;">SAVE ADMIN NOTE</button>
+            </form>
+        </div>
+
+        <!-- Request History -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">REQUEST HISTORY</h3>
+            
+            {% if return_req.status_history.all %}
+                <div style="position: relative; padding-left: 20px;">
+                    <div style="position: absolute; left: 6px; top: 8px; bottom: 8px; width: 2px; background: var(--border);"></div>
+                    
+                    {% for history in return_req.status_history.all %}
+                        <div style="position: relative; margin-bottom: {% if not forloop.last %}24px{% else %}0{% endif %};">
+                            <div style="position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: {% if forloop.first %}var(--primary-color){% else %}var(--border){% endif %}; border: 2px solid var(--bg-color);"></div>
+                            <p style="margin: 0; font-weight: bold; font-size: 0.95rem; color: {% if forloop.first %}var(--text-color){% else %}var(--text-muted){% endif %};">{{ history.get_status_display }}</p>
+                            <p style="margin: 2px 0 4px 0; font-size: 0.8rem; color: var(--text-muted);">{{ history.created_at|date:"d M Y, h:i A" }} {% if history.changed_by %}(by {{ history.changed_by.username }}){% endif %}</p>
+                            {% if history.note %}
+                            <p style="margin: 0; font-size: 0.85rem; color: var(--text-color); padding: 8px; background: rgba(255,255,255,0.02); border-radius: 4px; border: 1px solid var(--border);">{{ history.note }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin: 0;">No status history available.</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<!-- Lightbox Modal -->
+<div id="lightbox" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center;">
+    <button onclick="closeLightbox()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;">&times;</button>
+    <img id="lightbox-img" src="" alt="Preview" style="max-width: 90%; max-height: 90%; object-fit: contain;">
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function openLightbox(src) {
+        document.getElementById('lightbox-img').src = src;
+        document.getElementById('lightbox').style.display = 'flex';
+    }
+    
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+    }
+    
+    // Close lightbox on click outside image
+    document.getElementById('lightbox').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeLightbox();
+        }
+    });
+    
+    // Close on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('lightbox').style.display === 'flex') {
+            closeLightbox();
+        }
+    });
+</script>
+{% endblock %}

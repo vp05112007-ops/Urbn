@@ -1,0 +1,100 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Dashboard | URBN Admin{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+    
+    .stat-card {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .stat-card-title {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    
+    .stat-card-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-card-title">Total Orders</div>
+        <div class="stat-card-value">{{ total_orders }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-title">Pending Orders</div>
+        <div class="stat-card-value">{{ pending_orders }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-title">Total Revenue</div>
+        <div class="stat-card-value">₹{{ total_revenue|floatformat:"2" }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 20px; font-weight: 500;">Recent Orders</h3>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                    <td>{{ order.order_number }}</td>
+                    <td>{{ order.created_at|date:"M d, Y" }}</td>
+                    <td>{{ order.user.email }}</td>
+                    <td>
+                        <span class="badge {% if order.order_status == 'DELIVERED' %}badge-success{% elif order.order_status == 'CANCELLED' %}badge-danger{% else %}badge-info{% endif %}">
+                            {{ order.order_status }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {% if order.payment_status == 'PAID' %}badge-success{% elif order.payment_status == 'FAILED' %}badge-danger{% elif order.payment_status == 'REFUNDED' %}badge-warning{% else %}badge-info{% endif %}">
+                            {{ order.payment_status }}
+                        </span>
+                    </td>
+                    <td>₹{{ order.total_amount|floatformat:"2" }}</td>
+                    <td><a href="{% url 'admin_order_detail' order.order_number %}" style="color:var(--text-muted); text-decoration:none;">View</a></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">No orders found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

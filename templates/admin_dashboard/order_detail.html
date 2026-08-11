@@ -1,0 +1,119 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.order_number }} | URBN Admin{% endblock %}
+{% block page_title %}Order Details: {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    <!-- Left Column: Items and Customer Info -->
+    <div>
+        <div class="card">
+            <h3 style="margin-bottom: 20px; font-weight: 500;">Order Items</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Color/Size</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                        <tr>
+                            <td>
+                                {% if item.product %}
+                                    <div style="display:flex; align-items:center; gap: 12px;">
+                                        {% if item.product.primary_image_url %}
+                                        <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                        {% endif %}
+                                        <span>{{ item.product.name }}</span>
+                                    </div>
+                                {% else %}
+                                    {{ item.product_id }}
+                                {% endif %}
+                            </td>
+                            <td>{{ item.color }} / {{ item.size }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>₹{{ item.price|floatformat:"2" }}</td>
+                            <td>₹{% widthratio item.price 1 item.quantity %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 24px; text-align: right; font-size: 1.1rem;">
+                <strong>Order Total: ₹{{ order.total_price|floatformat:"2" }}</strong>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom: 20px; font-weight: 500;">Customer & Shipping</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                <div>
+                    <h4 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 8px;">Customer</h4>
+                    <p>{{ order.user.get_full_name|default:order.user.username }}</p>
+                    <p>{{ order.user.email }}</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 8px;">Shipping Address</h4>
+                    <p>{{ order.shipping_address.name }}<br>
+                       {{ order.shipping_address.street_address }}<br>
+                       {{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.postal_code }}<br>
+                       Phone: {{ order.shipping_address.phone_number }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Status Update Form -->
+    <div>
+        <div class="card">
+            <h3 style="margin-bottom: 20px; font-weight: 500;">Update Status</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <div style="margin-bottom: 16px;">
+                    <label style="display:block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem;">Order Status</label>
+                    <select name="status" style="width: 100%; background: var(--bg-dark); color: white; border: 1px solid var(--border); padding: 10px; border-radius: 4px;">
+                        <option value="PLACED" {% if order.status == 'PLACED' %}selected{% endif %}>PLACED</option>
+                        <option value="PAYMENT_CONFIRMED" {% if order.status == 'PAYMENT_CONFIRMED' %}selected{% endif %}>PAYMENT_CONFIRMED</option>
+                        <option value="CONFIRMED" {% if order.status == 'CONFIRMED' %}selected{% endif %}>CONFIRMED</option>
+                        <option value="PACKED" {% if order.status == 'PACKED' %}selected{% endif %}>PACKED</option>
+                        <option value="SHIPPED" {% if order.status == 'SHIPPED' %}selected{% endif %}>SHIPPED</option>
+                        <option value="OUT_FOR_DELIVERY" {% if order.status == 'OUT_FOR_DELIVERY' %}selected{% endif %}>OUT_FOR_DELIVERY</option>
+                        <option value="DELIVERED" {% if order.status == 'DELIVERED' %}selected{% endif %}>DELIVERED</option>
+                        <option value="CANCELLED" {% if order.status == 'CANCELLED' %}selected{% endif %}>CANCELLED</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="display:block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem;">Payment Status</label>
+                    <select name="payment_status" style="width: 100%; background: var(--bg-dark); color: white; border: 1px solid var(--border); padding: 10px; border-radius: 4px;">
+                        <option value="PENDING" {% if order.payment_status == 'PENDING' %}selected{% endif %}>PENDING</option>
+                        <option value="PAID" {% if order.payment_status == 'PAID' %}selected{% endif %}>PAID</option>
+                        <option value="FAILED" {% if order.payment_status == 'FAILED' %}selected{% endif %}>FAILED</option>
+                        <option value="REFUNDED" {% if order.payment_status == 'REFUNDED' %}selected{% endif %}>REFUNDED</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display:block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem;">Tracking Number</label>
+                    <input type="text" name="tracking_number" value="{{ order.tracking_number|default:'' }}" placeholder="e.g. TRK123456789" style="width: 100%; background: var(--bg-dark); color: white; border: 1px solid var(--border); padding: 10px; border-radius: 4px;">
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Changes</button>
+            </form>
+        </div>
+        
+        <div class="card">
+            <h3 style="margin-bottom: 20px; font-weight: 500;">Payment Info</h3>
+            <p style="margin-bottom: 8px;"><span style="color:var(--text-muted);">Razorpay Order ID:</span><br> {{ order.razorpay_order_id|default:'N/A' }}</p>
+            <p><span style="color:var(--text-muted);">Razorpay Payment ID:</span><br> {{ order.razorpay_payment_id|default:'N/A' }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

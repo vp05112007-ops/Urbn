@@ -1,0 +1,308 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return / Exchange Request | URBN</title>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+    <style>
+        .return-form {
+            background: rgba(18, 18, 18, 0.55);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: #888;
+            text-transform: uppercase;
+        }
+        .form-control {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 12px;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #fff;
+        }
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+        .radio-btn {
+            flex: 1;
+            text-align: center;
+        }
+        .radio-btn input[type="radio"] {
+            display: none;
+        }
+        .radio-btn label {
+            display: block;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 0;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: #fff;
+            border-radius: 4px;
+        }
+        .radio-btn input[type="radio"]:checked + label {
+            background: #fff;
+            color: #000;
+        }
+        
+        .image-upload-box {
+            border: 1px dashed rgba(255,255,255,0.2);
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .image-upload-box:hover {
+            border-color: #fff;
+        }
+        .image-previews {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .img-preview {
+            width: 80px;
+            height: 80px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 4px;
+            position: relative;
+        }
+        .remove-img {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .exchange-options {
+            display: none;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body class="inner-page orders-page">
+
+    {% include 'partials/navbar.html' %}
+
+    <main class="page-content">
+        <div class="orders-container">
+            
+            <a href="{% url 'order_details' order.order_number %}" class="back-link">← Back to Order Details</a>
+
+            <div class="order-details-card" style="margin-top: 20px;">
+                <header class="details-header">
+                    <div class="header-main">
+                        <h1>RETURN / EXCHANGE / REPLACEMENT</h1>
+                    </div>
+                </header>
+
+                <div class="items-list" style="margin-top: 20px;">
+                    <div class="item-row">
+                        <div class="item-image" style="background-image: url('{{ item.product_image_snapshot|default:'' }}');"></div>
+                        <div class="item-info">
+                            <h3>{{ item.product_name_snapshot }}</h3>
+                            <p>Size: {{ item.size|default:'Free Size' }} | Color: {{ item.color|default:'Default' }}</p>
+                            <p>Purchased Price: ₹{{ item.unit_price }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" class="return-form" id="returnForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label>STEP 1 — SELECT REQUEST TYPE</label>
+                        <div class="radio-group">
+                            <div class="radio-btn">
+                                <input type="radio" name="request_type" id="type_return" value="RETURN" {% if request.GET.type == 'RETURN' or not request.GET.type %}checked{% endif %}>
+                                <label for="type_return">Return</label>
+                            </div>
+                            <div class="radio-btn">
+                                <input type="radio" name="request_type" id="type_exchange" value="EXCHANGE" {% if request.GET.type == 'EXCHANGE' %}checked{% endif %}>
+                                <label for="type_exchange">Exchange</label>
+                            </div>
+                            <div class="radio-btn">
+                                <input type="radio" name="request_type" id="type_replacement" value="REPLACEMENT" {% if request.GET.type == 'REPLACEMENT' %}checked{% endif %}>
+                                <label for="type_replacement">Replacement</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exchange-options" id="exchangeOptions">
+                        <div class="form-group">
+                            <label>REQUESTED SIZE</label>
+                            <select name="exchange_size" class="form-control">
+                                <option value="">Select Size (if changing)</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>REQUESTED COLOR</label>
+                            <input type="text" name="exchange_color" class="form-control" placeholder="E.g., Black, White">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>QUANTITY (Max: {{ available_qty }})</label>
+                        <select name="quantity" class="form-control" required>
+                            {% for i in qty_range %}
+                                <option value="{{ i }}" {% if forloop.last %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>REASON</label>
+                        <select name="reason" class="form-control" id="reasonSelect" required>
+                            <option value="">Select a reason</option>
+                            <option value="Defective product">Defective product</option>
+                            <option value="Damaged during delivery">Damaged during delivery</option>
+                            <option value="Wrong product received">Wrong product received</option>
+                            <option value="Wrong size received">Wrong size received</option>
+                            <option value="Size doesn't fit">Size doesn't fit</option>
+                            <option value="Wrong color received">Wrong color received</option>
+                            <option value="Product differs from description">Product differs from description</option>
+                            <option value="Missing item/accessory">Missing item/accessory</option>
+                            <option value="Quality issue">Quality issue</option>
+                            <option value="Received used/damaged item">Received used/damaged item</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>DESCRIBE THE ISSUE</label>
+                        <textarea name="description" class="form-control" rows="4" placeholder="Please explain the issue with the product..." required minlength="10" maxlength="1000"></textarea>
+                    </div>
+
+                    <div class="form-group" id="photoUploadSection">
+                        <label>UPLOAD PRODUCT PHOTOS <span id="photoRequiredStar" style="color:red;display:inline;">*</span></label>
+                        <p style="font-size:11px; color:#888; margin-bottom:10px;">JPG, PNG, WEBP • Max 5MB each • Max 5 photos</p>
+                        
+                        <input type="file" name="images" id="imageInput" multiple accept="image/jpeg, image/png, image/webp" style="display:none;">
+                        
+                        <div class="image-upload-box" onclick="document.getElementById('imageInput').click()">
+                            <span style="font-size:24px;">+</span><br>
+                            Click to add photos showing the issue
+                        </div>
+                        
+                        <div class="image-previews" id="imagePreviews"></div>
+                    </div>
+
+                    <div style="margin-top: 40px;">
+                        <button type="submit" class="urbn-btn primary" style="width: 100%;">SUBMIT REQUEST</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const typeRadios = document.querySelectorAll('input[name="request_type"]');
+            const exchangeOptions = document.getElementById('exchangeOptions');
+            const reasonSelect = document.getElementById('reasonSelect');
+            const photoRequiredStar = document.getElementById('photoRequiredStar');
+            
+            function updateFormUI() {
+                const selectedType = document.querySelector('input[name="request_type"]:checked').value;
+                const reason = reasonSelect.value;
+                
+                // Show/hide exchange options
+                if(selectedType === 'EXCHANGE') {
+                    exchangeOptions.style.display = 'block';
+                } else {
+                    exchangeOptions.style.display = 'none';
+                }
+                
+                // Photos are now strictly required for all requests, so we always show the star.
+                photoRequiredStar.style.display = 'inline';
+            }
+            
+            typeRadios.forEach(radio => radio.addEventListener('change', updateFormUI));
+            reasonSelect.addEventListener('change', updateFormUI);
+            updateFormUI(); // initial run
+            
+            // Image Upload Handling (Preview only, file object handled by native input but we can't easily remove specific files from a FileList in older browsers. 
+            // For MVP, we will just show previews. If they click a preview's remove button, we will clear the whole input as a simple fallback, or ideally use DataTransfer)
+            const imageInput = document.getElementById('imageInput');
+            const imagePreviews = document.getElementById('imagePreviews');
+            
+            imageInput.addEventListener('change', function() {
+                imagePreviews.innerHTML = '';
+                if(this.files.length > 5) {
+                    alert('Maximum 5 images allowed');
+                    this.value = '';
+                    return;
+                }
+                
+                Array.from(this.files).forEach((file, index) => {
+                    if(file.size > 5 * 1024 * 1024) {
+                        alert(file.name + ' is too large. Max 5MB.');
+                        this.value = '';
+                        imagePreviews.innerHTML = '';
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'img-preview';
+                        div.style.backgroundImage = `url(${e.target.result})`;
+                        imagePreviews.appendChild(div);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            });
+            
+            document.getElementById('returnForm').addEventListener('submit', function(e) {
+                if(imageInput.files.length === 0) {
+                    e.preventDefault();
+                    alert("Compulsory photographic evidence of the product is required for all requests.");
+                }
+                // Removed the confirm dialog to prevent browser popup blockers from stopping submission
+            });
+        });
+    </script>
+</body>
+</html>

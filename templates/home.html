@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URBN | Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body class="inner-page">
+
+    {% include 'partials/navbar.html' %}
+
+    <main class="page-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content reveal-on-scroll">
+                <h1>NEW SEASON<br>STREETWEAR</h1>
+                <p>Premium pieces made for everyday movement. Discover the latest styles designed with intention.</p>
+                <a href="{% url 'collections' %}" class="btn-primary">SHOP COLLECTION</a>
+            </div>
+            <div class="hero-visual reveal-on-scroll delay-1">
+                <!-- Fallback gradient visualization instead of actual images -->
+            </div>
+        </section>
+
+        <!-- Category Section -->
+        <section class="categories">
+            <h2 class="section-title reveal-on-scroll">SHOP BY CATEGORY</h2>
+            <div class="category-grid">
+                <div class="category-card reveal-on-scroll delay-1" onclick="window.location.href='{% url 'categories' %}'">
+                    <h3>HOODIES</h3>
+                    <div class="category-arrow">&rarr;</div>
+                </div>
+                <div class="category-card reveal-on-scroll delay-2" onclick="window.location.href='{% url 'categories' %}'">
+                    <h3>T-SHIRTS</h3>
+                    <div class="category-arrow">&rarr;</div>
+                </div>
+                <div class="category-card reveal-on-scroll delay-3" onclick="window.location.href='{% url 'categories' %}'">
+                    <h3>JACKETS</h3>
+                    <div class="category-arrow">&rarr;</div>
+                </div>
+                <div class="category-card reveal-on-scroll delay-1" onclick="window.location.href='{% url 'categories' %}'">
+                    <h3>PANTS</h3>
+                    <div class="category-arrow">&rarr;</div>
+                </div>
+                <div class="category-card reveal-on-scroll delay-2" onclick="window.location.href='{% url 'categories' %}'">
+                    <h3>SWEATSHIRTS</h3>
+                    <div class="category-arrow">&rarr;</div>
+                </div>
+                <div class="category-card reveal-on-scroll delay-3" onclick="window.location.href='{% url 'categories' %}'">
+                    <h3>ACCESSORIES</h3>
+                    <div class="category-arrow">&rarr;</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trending Section -->
+        <section class="trending">
+            <h2 class="section-title reveal-on-scroll">TRENDING NOW</h2>
+            <div class="product-grid">
+                {% for p in trending_products %}
+                <div class="product-card reveal-on-scroll delay-{{ forloop.counter }}" data-id="{{ p.sku }}" data-name="{{ p.name }}" data-price="{{ p.price }}" data-image="{{ p.primary_image_url }}">
+                    <div class="product-image-wrap">
+                        <img src="{{ p.primary_image_url|default:'/static/images/placeholder.png' }}" alt="{{ p.name }}" onerror="this.src='/static/images/placeholder.png';" style="width:100%; height:100%; object-fit: cover;">
+                        <div class="wishlist-btn" data-id="{{ p.sku }}">&#9825;</div>
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">{{ p.category.name|upper }}</span>
+                        <span class="product-name">{{ p.name }}</span>
+                        <div class="product-price-row">
+                            <span class="product-price">₹{{ p.price|floatformat:"0" }}</span>
+                            <button class="add-to-cart-btn">ADD TO CART</button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No trending items right now.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Collections Section -->
+        <section class="collections">
+            <h2 class="section-title reveal-on-scroll">EXPLORE COLLECTIONS</h2>
+            <div class="collections-grid">
+                {% for c in collections %}
+                <div class="collection-item reveal-on-scroll delay-{{ forloop.counter }}">
+                    <div class="collection-bg" style="background: linear-gradient(0deg, rgba(0,0,0,0.9), transparent), {% if c.cover_image %}url('{{ c.cover_image.url }}'){% else %}#111{% endif %} no-repeat center/cover;"></div>
+                    <div class="collection-content">
+                        <h3>{{ c.name|upper }}</h3>
+                        <p>{{ c.description|truncatewords:8 }}</p>
+                        <a href="{% url 'categories' %}?collection={{ c.slug }}" class="btn-secondary">EXPLORE</a>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No collections found.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <script src="{% static 'js/global.js' %}"></script>
+    <script src="{% static 'js/home.js' %}"></script>
+    {% include 'partials/cart_drawer.html' %}
+</body>
+</html>

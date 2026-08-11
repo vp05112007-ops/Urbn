@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URBN | Customize</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/customize.css' %}">
+</head>
+<body class="inner-page">
+
+    {% include 'partials/navbar.html' %}
+
+
+
+    <main class="customize-container page-content">
+        
+        <!-- Controls Sidebar -->
+        <aside class="customize-sidebar glass-panel reveal-on-scroll">
+            <div class="customize-header">
+                <h1>STUDIO</h1>
+                <p>Build your own unique piece.</p>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">1. Choose Product</label>
+                <div class="option-grid">
+                    <button class="option-btn product-option active" data-value="Hoodie">Hoodie</button>
+                    <button class="option-btn product-option" data-value="T-Shirt">T-Shirt</button>
+                    <button class="option-btn product-option" data-value="Sweatshirt">Sweatshirt</button>
+                    <button class="option-btn product-option" data-value="Jacket">Jacket</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">2. Color</label>
+                <div class="color-options">
+                    <div class="color-btn active" data-value="Black" style="background: #000; box-shadow: 0 0 0 1px #333;"></div>
+                    <div class="color-btn" data-value="White" style="background: #fff; box-shadow: 0 0 0 1px #ddd;"></div>
+                    <div class="color-btn" data-value="Gray" style="background: #333; box-shadow: 0 0 0 1px #555;"></div>
+                    <div class="color-btn" data-value="Red" style="background: #8b0000; box-shadow: 0 0 0 1px #a00;"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">3. Size</label>
+                <div class="option-grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <button class="option-btn size-option" data-value="S">S</button>
+                    <button class="option-btn size-option active" data-value="M">M</button>
+                    <button class="option-btn size-option" data-value="L">L</button>
+                    <button class="option-btn size-option" data-value="XL">XL</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">4. Fit</label>
+                <div class="option-grid">
+                    <button class="option-btn fit-option" data-value="Standard">Standard</button>
+                    <button class="option-btn fit-option active" data-value="Oversized">Oversized</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">5. Custom Text / Print</label>
+                <input type="text" class="text-input" placeholder="Enter text (optional)">
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">6. Placement</label>
+                <div class="option-grid">
+                    <button class="option-btn placement-option active" data-value="Front Center">Front Center</button>
+                    <button class="option-btn placement-option" data-value="Left Chest">Left Chest</button>
+                    <button class="option-btn placement-option" data-value="Back Center">Back Center</button>
+                    <button class="option-btn placement-option" data-value="Sleeve">Sleeve</button>
+                </div>
+            </div>
+
+            <button class="btn-primary add-custom-btn">ADD CUSTOM TO CART - ₹3,499</button>
+        </aside>
+
+        <!-- Preview Area -->
+        <div class="customize-preview">
+            <div class="preview-box glass-panel reveal-on-scroll delay-1" id="preview-box">
+                <div id="product-image-container">
+                    <canvas id="product-canvas" class="product-canvas"></canvas>
+                    <canvas id="custom-text-canvas" class="custom-text-canvas"></canvas>
+                </div>
+            </div>
+            
+            <div id="customization-summary" class="customization-summary glass-panel reveal-on-scroll delay-2">
+                <!-- Summary will be populated by JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script src="{% static 'js/global.js' %}"></script>
+    <script src="{% static 'js/customize.js' %}"></script>
+    {% include 'partials/cart_drawer.html' %}
+</body>
+</html>

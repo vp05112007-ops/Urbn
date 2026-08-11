@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | URBN</title>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+</head>
+<body class="inner-page checkout-page">
+
+    {% include 'partials/navbar.html' %}
+
+    <main class="page-content">
+        <div class="checkout-container">
+            <h1 class="checkout-title">Checkout</h1>
+            
+            <div class="checkout-grid">
+                <!-- Left: Shipping Information -->
+                <div class="shipping-section">
+                    <h2>Delivery Information</h2>
+                    <form id="checkout-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first_name">First Name</label>
+                                <input type="text" id="first_name" name="first_name" value="{{ default_address.full_name|default:request.user.first_name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last_name">Last Name</label>
+                                <input type="text" id="last_name" name="last_name" value="{{ request.user.last_name }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" value="{{ request.user.email }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" value="{{ default_address.phone|default:'' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address_line_1">Address Line 1</label>
+                            <input type="text" id="address_line_1" name="address_line_1" value="{{ default_address.address_line_1|default:'' }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address_line_2">Address Line 2 (Optional)</label>
+                            <input type="text" id="address_line_2" name="address_line_2" value="{{ default_address.address_line_2|default:'' }}">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <input type="text" id="city" name="city" value="{{ default_address.city|default:'' }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State</label>
+                                <input type="text" id="state" name="state" value="{{ default_address.state|default:'' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="pincode">PIN Code</label>
+                                <input type="text" id="pincode" name="pincode" value="{{ default_address.postal_code|default:'' }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Country</label>
+                                <input type="text" id="country" name="country" value="{{ default_address.country|default:'India' }}" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right: Order Summary -->
+                <div class="summary-section">
+                    <h2>Order Summary</h2>
+                    
+                    <div class="summary-items">
+                        {% for item in items %}
+                        <div class="summary-item">
+                            <div class="item-image" style="background-image: url('{{ item.image_url|default:'' }}');"></div>
+                            <div class="item-details">
+                                <span class="item-name">{{ item.product_name }}</span>
+                                <span class="item-meta">{{ item.selected_size|default:'Free Size' }} • {{ item.selected_color|default:'Default' }}</span>
+                                <span class="item-qty">Qty: {{ item.quantity }}</span>
+                            </div>
+                            <div class="item-price">₹{{ item.unit_price }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="summary-totals">
+                        <div class="total-row">
+                            <span>Subtotal</span>
+                            <span>₹{{ subtotal }}</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Shipping</span>
+                            <span>{% if shipping_charge == 0 %}FREE{% else %}₹{{ shipping_charge }}{% endif %}</span>
+                        </div>
+                        {% if discount > 0 %}
+                        <div class="total-row discount">
+                            <span>Discount</span>
+                            <span>-₹{{ discount }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="total-row final-total">
+                            <span>TOTAL</span>
+                            <span>₹{{ total_amount }}</span>
+                        </div>
+                    </div>
+
+                    <button id="pay-btn" class="urbn-btn primary full-width">
+                        PAY NOW
+                    </button>
+                    <div id="payment-error" class="payment-error" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        window.RAZORPAY_KEY = "{{ razorpay_key_id }}";
+        window.URL_CREATE_PAYMENT = "{% url 'create_razorpay_order' %}";
+        window.URL_PAYMENT_SUCCESS = "{% url 'payment_success' %}";
+        window.URL_ORDER_CONFIRMATION = "{% url 'order_confirmation' 'ORDER_NO' %}";
+    </script>
+    <script src="{% static 'js/checkout.js' %}"></script>
+</body>
+</html>

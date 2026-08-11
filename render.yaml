@@ -1,0 +1,24 @@
+databases:
+  - name: urbn-db
+    databaseName: urbn_db
+    user: urbn_user
+    plan: free
+
+services:
+  - type: web
+    name: urbn-web
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn urbn_project.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: urbn-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "urbn-web.onrender.com" # Update this to your actual Render URL
+      # Add other required environment variables (e.g. RAZORPAY_*, EMAIL_*) in the Render Dashboard

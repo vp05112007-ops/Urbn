@@ -1,0 +1,77 @@
+{% extends "admin_dashboard/base_admin.html" %}
+
+{% block title %}Admin - Analytics{% endblock %}
+
+{% block content %}
+<div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2>Analytics Dashboard</h2>
+    <form method="GET" class="filter-form" style="display: flex; gap: 8px;">
+        <select name="range" class="form-select" onchange="this.form.submit()" style="padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-color);">
+            <option value="today" {% if range_filter == 'today' %}selected{% endif %}>Today</option>
+            <option value="7days" {% if range_filter == '7days' %}selected{% endif %}>Last 7 Days</option>
+            <option value="30days" {% if range_filter == '30days' %}selected{% endif %}>Last 30 Days</option>
+            <option value="thismonth" {% if range_filter == 'thismonth' %}selected{% endif %}>This Month</option>
+            <option value="thisyear" {% if range_filter == 'thisyear' %}selected{% endif %}>This Year</option>
+        </select>
+    </form>
+</div>
+
+<div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <!-- Total Revenue -->
+    <div class="stat-card" style="padding: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px;">
+        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 8px 0;">Total Revenue (Paid)</h3>
+        <p style="font-size: 1.5rem; margin: 0; font-weight: bold;">₹{{ total_revenue|floatformat:"2" }}</p>
+    </div>
+
+    <!-- Average Order Value -->
+    <div class="stat-card" style="padding: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px;">
+        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 8px 0;">Average Order Value</h3>
+        <p style="font-size: 1.5rem; margin: 0; font-weight: bold;">₹{{ average_order_value|floatformat:"2" }}</p>
+    </div>
+
+    <!-- Total Orders -->
+    <div class="stat-card" style="padding: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px;">
+        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 8px 0;">Total Orders</h3>
+        <p style="font-size: 1.5rem; margin: 0; font-weight: bold;">{{ total_orders }}</p>
+    </div>
+    
+    <!-- Pending Orders -->
+    <div class="stat-card" style="padding: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px;">
+        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 8px 0;">Pending Orders</h3>
+        <p style="font-size: 1.5rem; margin: 0; font-weight: bold; color: #f59e0b;">{{ pending_orders }}</p>
+    </div>
+
+    <!-- Low Stock -->
+    <div class="stat-card" style="padding: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px;">
+        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 8px 0;">Low Stock Items</h3>
+        <p style="font-size: 1.5rem; margin: 0; font-weight: bold; color: #ef4444;">{{ low_stock_products }}</p>
+    </div>
+
+    <!-- Return Requests -->
+    <div class="stat-card" style="padding: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px;">
+        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 8px 0;">Return Requests</h3>
+        <p style="font-size: 1.5rem; margin: 0; font-weight: bold;">{{ return_requests }}</p>
+    </div>
+
+    <!-- Refund Requests -->
+    <div class="stat-card" style="padding: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px;">
+        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 8px 0;">Refund Requests</h3>
+        <p style="font-size: 1.5rem; margin: 0; font-weight: bold;">{{ refund_requests }}</p>
+    </div>
+</div>
+
+<div class="card" style="padding: 24px;">
+    <h3 style="margin-top: 0;">Overview ({{ range_filter }})</h3>
+    {% if total_orders == 0 %}
+    <div style="height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px dashed var(--border); border-radius: 8px; color: var(--text-muted); text-align: center;">
+        <h2 style="margin: 0 0 8px 0;">NO SALES DATA YET</h2>
+        <p style="margin: 0;">Analytics will appear here once customers start placing orders.</p>
+    </div>
+    {% else %}
+    <div style="height: 300px; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--border); border-radius: 8px; color: var(--text-muted);">
+        <p>Chart coming soon...</p>
+        <!-- A chart library like Chart.js can be integrated here using the backend metrics passed down -->
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

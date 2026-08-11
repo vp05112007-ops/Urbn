@@ -1,0 +1,87 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Products | URBN Admin{% endblock %}
+{% block page_title %}Products Management{% endblock %}
+
+{% block content %}
+<div class="card" style="display: flex; gap: 16px; margin-bottom: 24px; padding: 16px 24px; align-items: center; justify-content: space-between;">
+    <form method="GET" style="display: flex; gap: 16px; align-items: center;">
+        <div>
+            <label style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Category</label>
+            <select name="category" style="background: var(--bg-dark); color: white; border: 1px solid var(--border); padding: 8px; border-radius: 4px;">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="margin-top: 18px;">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{% url 'admin_products' %}" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+    <div>
+        <a href="javascript:void(0)" class="btn btn-primary">+ Add Product</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product Info</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Badges</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>
+                        <div style="width: 50px; height: 50px; background: var(--bg-dark); border-radius: 4px; overflow: hidden;">
+                            {% if product.primary_image_url %}
+                            <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.7rem;">NO IMG</div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-weight: 500;">{{ product.name }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">SKU: {{ product.sku }} | Cat: {{ product.category.name }}</div>
+                    </td>
+                    <td>₹{{ product.price|floatformat:"2" }}</td>
+                    <td>{{ product.stock_quantity }}</td>
+                    <td>
+                        {% if product.is_active %}
+                        <span class="badge badge-success">Active</span>
+                        {% else %}
+                        <span class="badge badge-danger">Draft</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 4px;">
+                            {% if product.is_trending %}<span class="badge badge-warning">Trending</span>{% endif %}
+                            {% if product.is_new_arrival %}<span class="badge badge-info">New</span>{% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <a href="{% url 'admin_product_edit' product.sku %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">No products found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | URBN</title>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+</head>
+<body class="inner-page orders-page">
+
+    {% include 'partials/navbar.html' %}
+
+    <main class="page-content">
+        <div class="orders-container confirmation-container">
+            
+            <div class="confirmation-card">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24" width="48" height="48" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="16 8 10 14 8 12"></polyline>
+                    </svg>
+                </div>
+                
+                <h1>ORDER CONFIRMED</h1>
+                <p class="thank-you">Thank you for shopping with URBN.</p>
+                <p class="success-message">Your order has been successfully placed.</p>
+                
+                <div class="order-highlight">
+                    <p class="order-number">ORDER #{{ order.order_number }}</p>
+                    <p class="order-total">Total: ₹{{ order.total_amount }}</p>
+                    <!-- Mock estimated delivery -->
+                    <p class="order-delivery">Estimated Delivery: Processing</p>
+                </div>
+
+                <div class="confirmation-actions">
+                    <a href="{% url 'order_tracking' order.order_number %}" class="urbn-btn primary">TRACK ORDER</a>
+                    <a href="{% url 'my_orders' %}" class="urbn-btn secondary outline">VIEW MY ORDERS</a>
+                    <a href="{% url 'home' %}" class="urbn-btn tertiary link">CONTINUE SHOPPING</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

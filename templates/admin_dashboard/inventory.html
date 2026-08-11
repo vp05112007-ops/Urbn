@@ -1,0 +1,94 @@
+{% extends "admin_dashboard/base_admin.html" %}
+
+{% block title %}Admin - Inventory{% endblock %}
+
+{% block content %}
+<div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+        <h2>Inventory Management</h2>
+        <p style="color: var(--text-muted); margin-top: 4px;">Manage product stock and availability.</p>
+    </div>
+    <form class="search-form" method="GET" style="display: flex; gap: 8px;">
+        <select name="filter" class="form-select" onchange="this.form.submit()" style="padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-color);">
+            <option value="all" {% if current_filter == 'all' or not current_filter %}selected{% endif %}>All</option>
+            <option value="instock" {% if current_filter == 'instock' %}selected{% endif %}>In Stock</option>
+            <option value="lowstock" {% if current_filter == 'lowstock' %}selected{% endif %}>Low Stock</option>
+            <option value="outofstock" {% if current_filter == 'outofstock' %}selected{% endif %}>Out of Stock</option>
+        </select>
+        <input type="text" name="q" placeholder="Search by name or SKU..." value="{{ request.GET.q }}" class="form-input" style="padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-color);">
+        <button type="submit" class="btn btn-primary" style="padding: 8px 16px;">Search</button>
+    </form>
+</div>
+
+<div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <div class="stat-card" style="padding: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px;">
+        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 8px 0;">TOTAL PRODUCTS</h3>
+        <p style="font-size: 1.5rem; margin: 0; font-weight: bold;">{{ total_products }}</p>
+    </div>
+    <div class="stat-card" style="padding: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px;">
+        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 8px 0;">IN STOCK</h3>
+        <p style="font-size: 1.5rem; margin: 0; font-weight: bold; color: #22c55e;">{{ in_stock_count }}</p>
+    </div>
+    <div class="stat-card" style="padding: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px;">
+        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 8px 0;">LOW STOCK</h3>
+        <p style="font-size: 1.5rem; margin: 0; font-weight: bold; color: #f59e0b;">{{ low_stock_count }}</p>
+    </div>
+    <div class="stat-card" style="padding: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px;">
+        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 8px 0;">OUT OF STOCK</h3>
+        <p style="font-size: 1.5rem; margin: 0; font-weight: bold; color: #ef4444;">{{ out_of_stock_count }}</p>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom: 24px;">
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; text-align: left; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <th style="padding: 12px; color: var(--text-muted); font-weight: 500;">Product</th>
+                    <th style="padding: 12px; color: var(--text-muted); font-weight: 500;">SKU</th>
+                    <th style="padding: 12px; color: var(--text-muted); font-weight: 500;">Variant</th>
+                    <th style="padding: 12px; color: var(--text-muted); font-weight: 500;">Status</th>
+                    <th style="padding: 12px; color: var(--text-muted); font-weight: 500;">Current Stock</th>
+                    <th style="padding: 12px; color: var(--text-muted); font-weight: 500;">Reserved</th>
+                    <th style="padding: 12px; color: var(--text-muted); font-weight: 500;">Available</th>
+                    <th style="padding: 12px; color: var(--text-muted); font-weight: 500;">Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for variant in variants %}
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 12px;">{{ variant.product.name }}</td>
+                    <td style="padding: 12px; font-family: monospace;">{{ variant.product.sku }}</td>
+                    <td style="padding: 12px;">{{ variant.size }} / {{ variant.color }}</td>
+                    <td style="padding: 12px;">
+                        {% if variant.available_stock <= 0 %}
+                            <span class="badge badge-danger">OUT OF STOCK</span>
+                        {% elif variant.available_stock <= settings.low_stock_threshold %}
+                            <span class="badge badge-warning">LOW STOCK</span>
+                        {% else %}
+                            <span class="badge badge-success">IN STOCK</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px;">
+                        <form method="POST" style="display: flex; gap: 8px; align-items: center;">
+                            {% csrf_token %}
+                            <input type="hidden" name="variant_id" value="{{ variant.id }}">
+                            <input type="number" name="stock" value="{{ variant.stock }}" min="0" class="form-input" style="width: 80px; padding: 4px 8px;">
+                    </td>
+                    <td style="padding: 12px;">{{ variant.reserved_stock }}</td>
+                    <td style="padding: 12px; font-weight: bold;">{{ variant.available_stock }}</td>
+                    <td style="padding: 12px;">
+                            <button type="submit" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;">Save</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="padding: 24px; text-align: center; color: var(--text-muted);">No inventory found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

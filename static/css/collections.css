@@ -1,0 +1,161 @@
+/* Collections Specific Styles */
+
+.collections-header {
+    padding: 20px 5% 60px 5%;
+    text-align: center;
+}
+
+.collections-header h1 {
+    font-size: clamp(42px, 5vw, 76px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    margin: 0 0 16px 0;
+}
+
+.collections-header p {
+    color: var(--text-secondary);
+    font-size: 16px;
+    max-width: 650px;
+    margin: 0 auto;
+    opacity: 0.65;
+}
+
+.collections-container {
+    padding: 20px 5% 100px 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+}
+
+.collection-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.collection-block.reverse {
+    grid-template-columns: 1fr 1fr;
+    /* We'll handle visual reverse via CSS order */
+}
+
+.collection-block.reverse .collection-visual {
+    order: 2;
+}
+
+.collection-block.reverse .collection-info {
+    order: 1;
+}
+
+.collection-visual {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+
+.collection-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+}
+
+.collection-block:hover .collection-visual img {
+    transform: scale(1.05);
+}
+
+.collection-info {
+    padding: 40px;
+}
+
+.collection-info h2 {
+    font-size: 48px;
+    font-weight: 800;
+    margin: 0 0 24px 0;
+    line-height: 1;
+}
+
+.collection-info p {
+    font-size: 18px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+.explore-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--text-primary);
+    transition: gap 0.3s;
+}
+
+.explore-btn:hover {
+    gap: 20px;
+}
+
+/* Full Width Banner */
+.collection-banner {
+    width: 100%;
+    height: 60vh;
+    border-radius: var(--radius);
+    background: linear-gradient(0deg, rgba(0,0,0,0.6), rgba(0,0,0,0.2)), #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.banner-content {
+    position: relative;
+    z-index: 2;
+    padding: 40px;
+}
+
+.banner-content h2 {
+    font-size: 64px;
+    font-weight: 800;
+    margin: 0 0 16px 0;
+}
+
+.banner-content p {
+    font-size: 20px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 40px auto;
+}
+
+@media (max-width: 1024px) {
+    .collection-block {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    .collection-block.reverse .collection-visual {
+        order: 1;
+    }
+    
+    .collection-block.reverse .collection-info {
+        order: 2;
+    }
+    .collection-info {
+        padding: 0;
+    }
+    .banner-content h2 {
+        font-size: 40px;
+    }
+}

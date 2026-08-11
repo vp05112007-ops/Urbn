@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URBN | All Products</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/categories.css' %}">
+</head>
+<body class="inner-page">
+
+    {% include 'partials/navbar.html' %}
+
+
+
+    <!-- Mobile Filter Toggle -->
+    <div class="mobile-filter-bar">
+        <button id="mobile-filter-btn">FILTER</button>
+        <button id="mobile-sort-btn">SORT</button>
+    </div>
+
+    <main class="shop-container page-content">
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="header-left">
+                <h1 class="reveal-on-scroll">ALL<br>PRODUCTS</h1>
+                <p class="reveal-on-scroll delay-1">Premium streetwear designed for everyday movement.</p>
+            </div>
+            <div class="header-right reveal-on-scroll delay-2">
+                <div class="products-count-top"><span id="product-count-display">0</span> PRODUCTS</div>
+                <div class="custom-sort" id="custom-sort-dropdown">
+                    <span class="sort-label">SORT BY</span>
+                    <div class="sort-selected">
+                        <span id="current-sort-val">Featured</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                    <div class="sort-options" id="sort-options-list">
+                        <div class="sort-option" data-value="featured">Featured</div>
+                        <div class="sort-option" data-value="newest">Newest</div>
+                        <div class="sort-option" data-value="price-low">Price: Low to High</div>
+                        <div class="sort-option" data-value="price-high">Price: High to Low</div>
+                        <div class="sort-option" data-value="name">Name: A-Z</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="shop-layout">
+            <!-- Sidebar Filters -->
+            <aside class="filters-sidebar" id="filters-sidebar">
+                <div class="mobile-sidebar-header">
+                    <h2>FILTERS</h2>
+                    <button class="close-sidebar-btn">&times;</button>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="filter-title">CATEGORY <span class="toggle-icon">+</span></div>
+                    <div class="filter-options">
+                        <label class="filter-label"><input type="radio" name="category" value="All Categories" checked> All Categories</label>
+                        <label class="filter-label"><input type="radio" name="category" value="Hoodies"> Hoodies</label>
+                        <label class="filter-label"><input type="radio" name="category" value="T-Shirts"> T-Shirts</label>
+                        <label class="filter-label"><input type="radio" name="category" value="Jackets"> Jackets</label>
+                        <label class="filter-label"><input type="radio" name="category" value="Pants"> Pants</label>
+                        <label class="filter-label"><input type="radio" name="category" value="Sweatshirts"> Sweatshirts</label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-title">SIZE <span class="toggle-icon">+</span></div>
+                    <div class="filter-options size-options">
+                        <label class="size-box"><input type="checkbox" name="size" value="S"> S</label>
+                        <label class="size-box"><input type="checkbox" name="size" value="M"> M</label>
+                        <label class="size-box"><input type="checkbox" name="size" value="L"> L</label>
+                        <label class="size-box"><input type="checkbox" name="size" value="XL"> XL</label>
+                        <label class="size-box"><input type="checkbox" name="size" value="XXL"> XXL</label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-title">COLOR <span class="toggle-icon">+</span></div>
+                    <div class="color-options">
+                        <label class="color-circle" style="background: #000;" title="Black"><input type="checkbox" name="color" value="Black"></label>
+                        <label class="color-circle" style="background: #fff;" title="White"><input type="checkbox" name="color" value="White"></label>
+                        <label class="color-circle" style="background: #777;" title="Gray"><input type="checkbox" name="color" value="Gray"></label>
+                        <label class="color-circle" style="background: #3c5233;" title="Green"><input type="checkbox" name="color" value="Green"></label>
+                        <label class="color-circle" style="background: #8c1c1c;" title="Red"><input type="checkbox" name="color" value="Red"></label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-title">PRICE <span class="toggle-icon">+</span></div>
+                    <div class="filter-options">
+                        <label class="filter-label"><input type="radio" name="price" value="under-1000"> Under ₹1,000</label>
+                        <label class="filter-label"><input type="radio" name="price" value="1000-2500"> ₹1,000 - ₹2,500</label>
+                        <label class="filter-label"><input type="radio" name="price" value="over-2500"> Over ₹2,500</label>
+                    </div>
+                </div>
+
+                <button class="clear-filters-btn" id="clear-filters-btn">CLEAR FILTERS</button>
+            </aside>
+
+            <!-- Products Area -->
+            <div class="products-area">
+                <div class="active-filters-container" id="active-filters-container">
+                    <!-- Filter chips injected by JS -->
+                </div>
+
+                <div class="product-grid" id="product-grid">
+                    <!-- Products rendered via JS -->
+                </div>
+                
+                <div class="empty-state" id="empty-state" style="display: none;">
+                    <h3>NO PRODUCTS FOUND</h3>
+                    <p>Try adjusting your filters.</p>
+                    <button class="btn-primary" onclick="document.getElementById('clear-filters-btn').click()">CLEAR FILTERS</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Sort Modal -->
+    <div id="mobile-sort-modal" class="mobile-modal">
+        <div class="mobile-modal-content">
+            <div class="mobile-modal-header">
+                <h2>SORT BY</h2>
+                <button class="close-modal-btn">&times;</button>
+            </div>
+            <div class="mobile-sort-options">
+                <label><input type="radio" name="mobile-sort" value="featured" checked> Featured</label>
+                <label><input type="radio" name="mobile-sort" value="newest"> Newest</label>
+                <label><input type="radio" name="mobile-sort" value="price-low"> Price: Low to High</label>
+                <label><input type="radio" name="mobile-sort" value="price-high"> Price: High to Low</label>
+                <label><input type="radio" name="mobile-sort" value="name"> Name: A-Z</label>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/global.js' %}?v=2"></script>
+    <script src="{% static 'js/categories.js' %}?v=2"></script>
+    {% include 'partials/cart_drawer.html' %}
+</body>
+</html>

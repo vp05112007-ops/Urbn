@@ -1,0 +1,65 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Returns & Refunds | URBN Admin{% endblock %}
+{% block page_title %}Returns Management{% endblock %}
+
+{% block content %}
+<div class="card" style="display: flex; gap: 16px; margin-bottom: 24px; padding: 16px 24px; align-items: center;">
+    <form method="GET" style="display: flex; gap: 16px; align-items: center;">
+        <div>
+            <label style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Status</label>
+            <select name="status" style="background: var(--bg-dark); color: white; border: 1px solid var(--border); padding: 8px; border-radius: 4px;">
+                <option value="">All Statuses</option>
+                <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>PENDING</option>
+                <option value="APPROVED" {% if request.GET.status == 'APPROVED' %}selected{% endif %}>APPROVED</option>
+                <option value="REJECTED" {% if request.GET.status == 'REJECTED' %}selected{% endif %}>REJECTED</option>
+                <option value="REFUNDED" {% if request.GET.status == 'REFUNDED' %}selected{% endif %}>REFUNDED</option>
+                <option value="EXCHANGED" {% if request.GET.status == 'EXCHANGED' %}selected{% endif %}>EXCHANGED</option>
+                <option value="REPLACED" {% if request.GET.status == 'REPLACED' %}selected{% endif %}>REPLACED</option>
+            </select>
+        </div>
+        <div style="margin-top: 18px;">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{% url 'admin_returns' %}" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Request #</th>
+                    <th>Date</th>
+                    <th>Order #</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ret in returns %}
+                <tr>
+                    <td>{{ ret.request_number }}</td>
+                    <td>{{ ret.created_at|date:"M d, Y" }}</td>
+                    <td><a href="{% url 'admin_order_detail' ret.order.order_number %}" style="color:var(--text-main);">{{ ret.order.order_number }}</a></td>
+                    <td>{{ ret.get_request_type_display }}</td>
+                    <td>
+                        <span class="badge {% if ret.status == 'APPROVED' or ret.status == 'REFUNDED' or ret.status == 'EXCHANGED' or ret.status == 'REPLACED' %}badge-success{% elif ret.status == 'REJECTED' %}badge-danger{% else %}badge-warning{% endif %}">
+                            {{ ret.status }}
+                        </span>
+                    </td>
+                    <td><a href="{% url 'admin_return_detail' ret.request_number %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;">View</a></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">No return requests found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

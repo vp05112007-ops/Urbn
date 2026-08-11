@@ -1,0 +1,77 @@
+<!-- Liquid Glass SVG Filter -->
+<svg aria-hidden="true" class="hidden" focusable="false" style="display: none;">
+  <title>Glass Effect Filter</title>
+  <defs>
+    <filter color-interpolation-filters="sRGB" height="200%" id="glass-filter" width="200%" x="-50%" y="-50%">
+      <feTurbulence baseFrequency="0.05 0.05" numOctaves="1" result="turbulence" seed="1" type="fractalNoise"/>
+      <feGaussianBlur in="turbulence" result="blurredNoise" stdDeviation="2"/>
+      <feDisplacementMap in="SourceGraphic" in2="blurredNoise" result="displaced" scale="30" xChannelSelector="R" yChannelSelector="B"/>
+      <feGaussianBlur in="displaced" result="finalBlur" stdDeviation="4"/>
+      <feComposite in="finalBlur" in2="finalBlur" operator="over"/>
+    </filter>
+  </defs>
+</svg>
+
+<nav class="global-nav liquid-glass">
+    <a href="{% url 'home' %}" class="nav-left">URBN</a>
+    <div class="nav-center">
+        <a href="{% url 'home' %}">HOME</a>
+        <a href="{% url 'categories' %}">CATEGORIES</a>
+        <a href="{% url 'trending' %}">TRENDING</a>
+        <a href="{% url 'collections' %}">COLLECTIONS</a>
+        <a href="{% url 'customize' %}">CUSTOMIZE</a>
+    </div>
+    <div class="nav-right">
+        <a href="javascript:void(0)" class="trigger-search">SEARCH</a>
+        {% if user.is_authenticated %}
+            <div class="nav-profile-group">
+                <a href="{% url 'profile' %}" class="nav-avatar-link" aria-label="View Profile">
+                    {% if user.profile.profile_photo %}
+                        <img src="{{ user.profile.profile_photo.url }}" alt="Profile Avatar" class="nav-avatar">
+                    {% else %}
+                        <div class="nav-avatar fallback">{% with initial=user.first_name|default:user.username|make_list|first|upper %}{{ initial }}{% endwith %}</div>
+                    {% endif %}
+                </a>
+                <div class="profile-dropdown liquid-glass">
+                    <div class="dropdown-header">
+                        {% if user.profile.profile_photo %}
+                            <img src="{{ user.profile.profile_photo.url }}" alt="Avatar" class="nav-avatar">
+                        {% else %}
+                            <div class="nav-avatar fallback">{% with initial=user.first_name|default:user.username|make_list|first|upper %}{{ initial }}{% endwith %}</div>
+                        {% endif %}
+                        <div class="dropdown-user-info">
+                            <strong>{{ user.first_name|default:user.username }}</strong>
+                            <span>{{ user.email }}</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'profile' %}">Profile</a>
+                    <a href="{% url 'my_orders' %}">Orders</a>
+                    <a href="{% url 'return_requests_list' %}">Returns</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'account_logout' %}">Logout</a>
+                </div>
+            </div>
+        {% else %}
+            <a href="{% url 'account_login' %}">LOGIN</a>
+        {% endif %}
+        <a href="{% url 'cart' %}" class="cart-count-wrapper">BAG <span class="cart-count">0</span></a>
+        <div class="mobile-menu-toggle">&#9776;</div>
+    </div>
+</nav>
+
+<!-- Search Overlay -->
+<div id="search-overlay">
+    <div class="close-search">&times;</div>
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search products...">
+        <div class="trending-searches">
+            <h4>TRENDING SEARCHES</h4>
+            <div class="search-tags">
+                <span class="search-tag">Hoodies</span>
+                <span class="search-tag">Oversized T-Shirts</span>
+                <span class="search-tag">Jackets</span>
+                <span class="search-tag">Cargo Pants</span>
+            </div>
+        </div>
+    </div>
+</div>

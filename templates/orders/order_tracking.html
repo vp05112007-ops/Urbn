@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order | URBN</title>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+</head>
+<body class="inner-page orders-page">
+
+    {% include 'partials/navbar.html' %}
+
+    <main class="page-content">
+        <div class="orders-container tracking-container">
+            
+            <a href="{% url 'order_details' order.order_number %}" class="back-link">← Back to Order Details</a>
+
+            <div class="tracking-card">
+                <header class="tracking-header">
+                    <h1>TRACKING</h1>
+                    <p class="order-number">ORDER #{{ order.order_number }}</p>
+                    
+                    <div class="estimated-delivery">
+                        <span class="label">ESTIMATED DELIVERY</span>
+                        <span class="value">Pending Update</span> <!-- Future API hook -->
+                    </div>
+                </header>
+
+                <div class="timeline-container">
+                    
+                    {% for step in status_order %}
+                        {% if step.0 == 'CANCELLED' %}
+                            <!-- Ignore cancelled in standard timeline unless order is cancelled -->
+                        {% else %}
+                            <div class="timeline-step {% if forloop.counter0 < current_step_index %}completed{% elif forloop.counter0 == current_step_index %}current{% else %}upcoming{% endif %}">
+                                <div class="timeline-icon">
+                                    {% if forloop.counter0 <= current_step_index %}
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    {% endif %}
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="step-title">
+                                        {{ step.1 }}
+                                    </div>
+                                    <div class="step-meta">
+                                        {% for hist in history %}
+                                            {% if hist.status == step.0 %}
+                                                {{ hist.created_at|date:"d M • h:i A" }}
+                                            {% endif %}
+                                        {% empty %}
+                                            <!-- Upcoming -->
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if order.order_status == 'CANCELLED' %}
+                        <div class="timeline-step current cancelled">
+                            <div class="timeline-icon">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="step-title">Cancelled</div>
+                                <div class="step-meta">This order has been cancelled.</div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

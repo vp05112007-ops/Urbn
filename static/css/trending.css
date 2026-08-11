@@ -1,0 +1,98 @@
+/* Trending Specific Styles - Scoped to .trending-page */
+
+/* Fix root cause of excessive spacing: override the global page-content padding-top slightly */
+.trending-page .page-content {
+    padding-top: clamp(90px, 12vh, 120px);
+}
+
+.trending-page .trending-hero {
+    margin-top: 0; /* Removed the excessive 100px margin */
+    padding: 0 5%;
+    min-height: 340px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Subtle section divider */
+}
+
+.trending-page .trending-hero h1 {
+    font-size: clamp(42px, 5vw, 72px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin: 0 0 20px 0;
+    text-transform: uppercase;
+    color: #ffffff; /* Keeping the white/off-white color */
+}
+
+.trending-page .trending-hero p {
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 18px;
+    line-height: 1.5;
+    max-width: 600px;
+    margin: 0;
+}
+
+/* Ensure the Best Sellers section flows naturally without huge empty areas */
+.trending-page .trending-section {
+    padding-top: 60px;
+    padding-bottom: 80px;
+    padding-left: 5%;
+    padding-right: 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.trending-page .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px; /* 40px spacing before product grid */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 16px;
+}
+
+.trending-page .section-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.trending-page .view-all {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.62);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+}
+
+.trending-page .view-all:hover {
+    color: #ffffff;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .trending-page .trending-hero {
+        min-height: 280px;
+        padding-top: 20px;
+        padding-bottom: 40px;
+    }
+    
+    .trending-page .trending-hero h1 {
+        font-size: 40px;
+    }
+    
+    .trending-page .trending-hero p {
+        font-size: 16px;
+    }
+    
+    .trending-page .trending-section {
+        padding-top: 40px;
+        padding-bottom: 60px;
+    }
+}

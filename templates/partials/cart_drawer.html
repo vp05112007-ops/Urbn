@@ -1,0 +1,28 @@
+{% load static %}
+
+<!-- Cart Backdrop -->
+<div id="cart-backdrop" class="cart-backdrop"></div>
+
+<!-- Cart Drawer -->
+<div id="cart-drawer" class="cart-drawer">
+    <div class="cart-header">
+        <div class="cart-header-title">
+            <h2>YOUR BAG</h2>
+            <span id="cart-item-count-text">0 ITEMS</span>
+        </div>
+        <button class="cart-close-btn" id="close-cart-btn">&times;</button>
+    </div>
+
+    <div class="cart-footer">
+        <div class="cart-subtotal">
+            <span>Subtotal</span>
+            <span id="cart-subtotal-amount">₹0.00</span>
+        </div>
+        <button class="btn-primary cart-checkout-btn" onclick="window.location.href='{% url 'cart' %}'">CHECKOUT</button>
+        <button class="btn-secondary cart-continue-btn" id="continue-shopping-btn">CONTINUE SHOPPING</button>
+    </div>
+
+    <div class="cart-items-container" id="cart-items-container">
+        <!-- Cart items will be injected here via JS -->
+    </div>
+</div>

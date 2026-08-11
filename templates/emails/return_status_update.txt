@@ -1,0 +1,19 @@
+Hi {{ customer_name }},
+
+Your request ({{ return_request.get_request_type_display }}) has been updated.
+
+Request Number: #{{ return_request.request_number }}
+Order Number: #{{ return_request.order.order_number }}
+Product: {{ return_request.order_item.product_name_snapshot }}
+Current Status: {{ status }}
+
+{% if return_request.rejection_reason and return_request.status == 'REJECTED' %}
+Note: {{ return_request.rejection_reason }}
+{% endif %}
+
+You can track the progress of your request from your URBN account here:
+https://{{ domain }}/returns/{{ return_request.request_number }}/
+
+Regards,
+URBN
+Streetwear designed for everyday movement.

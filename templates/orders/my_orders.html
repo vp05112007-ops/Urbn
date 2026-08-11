@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | URBN</title>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+</head>
+<body class="inner-page orders-page">
+
+    {% include 'partials/navbar.html' %}
+
+    <main class="page-content">
+        <div class="orders-container">
+            <header class="orders-header">
+                <h1>MY ORDERS</h1>
+                <p>Track and manage your URBN purchases.</p>
+            </header>
+            
+            {% if orders %}
+                <div class="orders-list">
+                    {% for order in orders %}
+                    <div class="order-card">
+                        <div class="order-card-header">
+                            <div class="order-meta">
+                                <span class="order-number">ORDER #{{ order.order_number }}</span>
+                                <span class="order-date">{{ order.created_at|date:"d M Y" }}</span>
+                            </div>
+                            <div class="order-status-badge {{ order.payment_status|lower }}">
+                                {{ order.payment_status }}
+                            </div>
+                        </div>
+
+                        <div class="order-card-body">
+                            <div class="order-items-preview">
+                                {% for item in order.items.all|slice:":2" %}
+                                <div class="order-item-mini">
+                                    <div class="item-img" style="background-image: url('{{ item.product_image_snapshot|default:'' }}');"></div>
+                                    <div class="item-info">
+                                        <div class="name">{{ item.product_name_snapshot }}</div>
+                                        <div class="meta">{{ item.size|default:'Free Size' }} • {{ item.color|default:'Default' }}</div>
+                                        <div class="qty">Qty: {{ item.quantity }}</div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% if order.items.count > 2 %}
+                                <div class="more-items">+{{ order.items.count|add:"-2" }} more items</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="order-summary-block">
+                                <div class="total-label">Total</div>
+                                <div class="total-amount">₹{{ order.total_amount }}</div>
+                                <div class="status-label">Status: <span class="status-value">{{ order.get_order_status_display }}</span></div>
+                            </div>
+                        </div>
+
+                        <div class="order-card-actions">
+                            <a href="{% url 'order_details' order.order_number %}" class="urbn-btn secondary outline">VIEW ORDER</a>
+                            <a href="{% url 'order_tracking' order.order_number %}" class="urbn-btn primary">TRACK ORDER</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-orders">
+                    <h2>NO ORDERS YET</h2>
+                    <p>Your URBN purchases will appear here.</p>
+                    <a href="{% url 'home' %}" class="urbn-btn primary">START SHOPPING</a>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

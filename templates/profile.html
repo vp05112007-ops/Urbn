@@ -1,0 +1,576 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>URBN | Account Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+
+    <nav class="global-nav" style="z-index: 1000; position: relative;">
+        <a href="{% url 'home' %}" class="nav-left">URBN</a>
+        <div class="nav-center">
+            <a href="{% url 'home' %}">HOME</a>
+            <a href="{% url 'categories' %}">CATEGORIES</a>
+            <a href="{% url 'trending' %}">TRENDING</a>
+            <a href="{% url 'collections' %}">COLLECTIONS</a>
+            <a href="{% url 'customize' %}">CUSTOMIZE</a>
+        </div>
+        <div class="nav-right">
+            <a href="javascript:void(0)" class="trigger-search">SEARCH</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}" style="color: var(--text-primary);">PROFILE</a>
+            {% else %}
+                <a href="{% url 'account_login' %}">LOGIN</a>
+            {% endif %}
+            <a href="{% url 'cart' %}" class="cart-count-wrapper">BAG <span class="cart-count">0</span></a>
+            <div class="mobile-menu-toggle">&#9776;</div>
+        </div>
+    </nav>
+
+    <!-- Search Overlay -->
+    <div id="search-overlay">
+        <div class="close-search">&times;</div>
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search products...">
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <main class="profile-dashboard">
+        
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-user-info">
+                <div class="sidebar-avatar">
+                    {% if profile.profile_photo %}
+                        <img src="{{ profile.profile_photo.url }}" alt="Profile Photo" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                    {% else %}
+                        {{ user.first_name|default:user.username|slice:":1"|upper }}
+                    {% endif %}
+                </div>
+                <h2>{{ profile.display_name|default:user.first_name|default:user.username }}</h2>
+                <p>{{ user.email }}</p>
+            </div>
+            
+            <nav class="dashboard-nav">
+                <button class="nav-btn active" data-target="personal-info-section">Personal Information</button>
+                <button class="nav-btn" data-target="addresses-section">Addresses</button>
+                <button class="nav-btn" data-target="security-section">Security</button>
+                <button class="nav-btn" data-target="email-section">Email & Account</button>
+                <a href="{% url 'my_orders' %}" class="nav-btn" style="text-decoration:none; display:block;">My Orders</a>
+                <a href="{% url 'account_logout' %}" class="nav-btn logout-btn">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            
+            <!-- SECTION: Personal Info (Upgraded) -->
+            <section id="personal-info-section" class="dashboard-section active">
+                <form id="personal-info-form" class="pi-form-grid">
+                    
+                    <!-- 1. PROFILE CARD -->
+                    <div class="glass-card pi-card">
+                        <h3>Profile</h3>
+                        <div class="pi-profile-header">
+                            <div class="pi-avatar">
+                                {% if profile.profile_photo %}
+                                    <img src="{{ profile.profile_photo.url }}" alt="Profile Photo">
+                                {% else %}
+                                    {{ user.first_name|default:user.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <div class="pi-avatar-actions">
+                                <input type="file" id="profile-photo-input" accept="image/png, image/jpeg, image/gif" style="display: none;">
+                                <button type="button" class="btn-secondary btn-small" onclick="document.getElementById('profile-photo-input').click()">Change Photo</button>
+                                {% if profile.profile_photo %}
+                                <button type="button" class="btn-text btn-small" id="btn-remove-photo" style="margin-left: 8px; color: #ff4444;">Remove</button>
+                                {% endif %}
+                                <span class="text-muted" style="font-size:12px; display:block; margin-top:8px;">JPG, GIF or PNG. Max size of 5MB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. ACCOUNT INFORMATION CARD (Read Only) -->
+                    <div class="glass-card pi-card">
+                        <h3>Account Information</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Member Since</span>
+                                <span class="info-value">{{ user.date_joined|date:"F Y" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Login Method</span>
+                                <span class="info-value">{% if is_google_user %}Google{% else %}Email / Password{% endif %}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email Status</span>
+                                <span class="info-value status-active">Verified</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. BASIC INFORMATION CARD -->
+                    <div class="glass-card pi-card col-span-2">
+                        <h3>Basic Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>First Name</label>
+                                <input type="text" id="id_first_name" name="first_name" value="{{ user.first_name }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name</label>
+                                <input type="text" id="id_last_name" name="last_name" value="{{ user.last_name }}">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Display Name</label>
+                                <input type="text" id="id_display_name" name="display_name" value="{{ profile.display_name|default:'' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Date of Birth</label>
+                                <input type="date" id="id_date_of_birth" name="date_of_birth" value="{{ profile.date_of_birth|date:'Y-m-d'|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. CONTACT INFORMATION CARD -->
+                    <div class="glass-card pi-card col-span-2">
+                        <h3>Contact Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email Address <span class="badge" style="background:#4caf50; color:white; margin-left:8px;">Verified</span></label>
+                                <input type="email" value="{{ user.email }}" disabled style="opacity:0.7; cursor:not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" id="id_phone" name="phone" value="{{ profile.phone|default:'' }}">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Country</label>
+                                <input type="text" id="id_country" name="country" value="{{ profile.country|default:'' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Preferred Language</label>
+                                <select id="id_preferred_language" name="preferred_language" class="urbn-select">
+                                    <option value="English" {% if profile.preferred_language == 'English' %}selected{% endif %}>English</option>
+                                    <option value="French" {% if profile.preferred_language == 'French' %}selected{% endif %}>French</option>
+                                    <option value="Spanish" {% if profile.preferred_language == 'Spanish' %}selected{% endif %}>Spanish</option>
+                                    <option value="German" {% if profile.preferred_language == 'German' %}selected{% endif %}>German</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. STYLE PREFERENCES CARD -->
+                    <div class="glass-card pi-card col-span-2">
+                        <h3>Style Preferences</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Preferred Clothing Size</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="clothing_size" value="S" {% if profile.clothing_size == 'S' %}checked{% endif %}>
+                                        <span class="radio-custom">S</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="clothing_size" value="M" {% if profile.clothing_size == 'M' %}checked{% endif %}>
+                                        <span class="radio-custom">M</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="clothing_size" value="L" {% if profile.clothing_size == 'L' %}checked{% endif %}>
+                                        <span class="radio-custom">L</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="clothing_size" value="XL" {% if profile.clothing_size == 'XL' %}checked{% endif %}>
+                                        <span class="radio-custom">XL</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="clothing_size" value="XXL" {% if profile.clothing_size == 'XXL' %}checked{% endif %}>
+                                        <span class="radio-custom">XXL</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Preferred Fit</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="preferred_fit" value="Standard" {% if profile.preferred_fit == 'Standard' %}checked{% endif %}>
+                                        <span class="radio-custom">Standard</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="preferred_fit" value="Oversized" {% if profile.preferred_fit == 'Oversized' %}checked{% endif %}>
+                                        <span class="radio-custom">Oversized</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 16px;">
+                            <label>Preferred Categories</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="preferred_categories" value="Hoodies" {% if 'Hoodies' in profile.preferred_categories %}checked{% endif %}>
+                                    <span class="checkbox-custom">Hoodies</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="preferred_categories" value="T-Shirts" {% if 'T-Shirts' in profile.preferred_categories %}checked{% endif %}>
+                                    <span class="checkbox-custom">T-Shirts</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="preferred_categories" value="Jackets" {% if 'Jackets' in profile.preferred_categories %}checked{% endif %}>
+                                    <span class="checkbox-custom">Jackets</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="preferred_categories" value="Pants" {% if 'Pants' in profile.preferred_categories %}checked{% endif %}>
+                                    <span class="checkbox-custom">Pants</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="preferred_categories" value="Sweatshirts" {% if 'Sweatshirts' in profile.preferred_categories %}checked{% endif %}>
+                                    <span class="checkbox-custom">Sweatshirts</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pi-form-actions col-span-2">
+                        <button type="button" class="btn-secondary" onclick="window.location.reload();">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- SECTION: Addresses -->
+            <section id="addresses-section" class="dashboard-section">
+                <div class="glass-card">
+                    <div class="section-header-flex">
+                        <h3>Saved Addresses</h3>
+                        <button id="btn-add-address" class="btn-secondary">Add Address</button>
+                    </div>
+                    
+                    <div id="address-list">
+                        {% for addr in addresses %}
+                        <div class="address-card" data-id="{{ addr.id }}">
+                            <div class="address-details">
+                                <strong>{{ addr.full_name }} {% if addr.is_default %}<span class="badge">Default</span>{% endif %}</strong>
+                                <span>{{ addr.address_line_1 }} {% if addr.address_line_2 %}{{ addr.address_line_2 }}{% endif %}</span>
+                                <span>{{ addr.city }}, {{ addr.state }} {{ addr.postal_code }}</span>
+                                <span>{{ addr.country }}</span>
+                                <span>Phone: {{ addr.phone }}</span>
+                            </div>
+                            <div class="address-actions">
+                                {% if not addr.is_default %}
+                                <button class="btn-text btn-set-default" data-id="{{ addr.id }}">Set Default</button>
+                                {% endif %}
+                                <button class="btn-text btn-delete-address" data-id="{{ addr.id }}">Delete</button>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="empty-state">You have no saved addresses.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Security -->
+            <section id="security-section" class="dashboard-section">
+                <div class="security-grid">
+                    
+                    <!-- Password Security -->
+                    <div class="glass-card">
+                        <h3>Password Security</h3>
+                        {% if is_google_user and not has_password %}
+                            <p class="security-notice">You signed in using Google. To set a local password, please use the Forgot Password flow.</p>
+                            <a href="{% url 'password_reset' %}" class="btn-secondary" style="display:inline-block; margin-top:10px;">Set Local Password</a>
+                        {% else %}
+                            <form id="change-password-form">
+                                <div class="form-group">
+                                    <label>Current Password</label>
+                                    <input type="password" id="current_password" name="current_password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>New Password</label>
+                                    <input type="password" id="new_password" name="new_password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Confirm New Password</label>
+                                    <input type="password" id="confirm_password" name="confirm_password" required>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">Update Password</button>
+                                    <a href="{% url 'password_reset' %}" class="btn-text-muted">Forgot Password?</a>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- Two-Factor Authentication -->
+                    <div class="glass-card">
+                        <h3>Two-Factor Authentication</h3>
+                        <p class="text-muted" style="margin-bottom: 20px;">Add an extra layer of security to your URBN account.</p>
+                        
+                        <div class="status-box {% if user.two_factor.is_enabled %}status-enabled{% else %}status-disabled{% endif %}">
+                            <div class="status-indicator"></div>
+                            <span>{% if user.two_factor.is_enabled %}Enabled{% else %}Not enabled{% endif %}</span>
+                        </div>
+
+                        {% if user.two_factor.is_enabled %}
+                            <button class="btn-secondary btn-danger" id="btn-disable-2fa" style="margin-top: 16px;">Disable 2FA</button>
+                        {% else %}
+                            <button class="btn-primary" id="btn-enable-2fa" style="margin-top: 16px;">Enable 2FA</button>
+                        {% endif %}
+                    </div>
+
+                    <!-- Active Sessions -->
+                    <div class="glass-card col-span-2">
+                        <div class="section-header-flex">
+                            <h3>Where You're Logged In</h3>
+                            <button id="btn-logout-all" class="btn-secondary">Log Out All Other Sessions</button>
+                        </div>
+                        
+                        <div class="session-list">
+                            {% for session in login_sessions %}
+                            <div class="session-item">
+                                <div class="session-icon">
+                                    {% if 'Mac' in session.os or 'Windows' in session.os %}💻{% else %}📱{% endif %}
+                                </div>
+                                <div class="session-info">
+                                    <strong>{{ session.device|default:"Unknown Device" }} &bull; {{ session.browser|default:"Unknown Browser" }}</strong>
+                                    <span class="text-muted">
+                                        {{ session.os|default:"Unknown OS" }} 
+                                        {% if session.ip_address %}&bull; {{ session.ip_address }}{% endif %}
+                                    </span>
+                                    <span class="text-muted">
+                                        {% if session.session_key == current_session_key %}
+                                            <span style="color: #4caf50;">Current session</span> &bull; Active now
+                                        {% else %}
+                                            Last active {{ session.last_active|timesince }} ago
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                {% if session.session_key != current_session_key %}
+                                <div class="session-actions">
+                                    <button class="btn-text btn-logout-session" data-key="{{ session.session_key }}">Log Out</button>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% empty %}
+                            <p class="empty-state">No active sessions found.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Login Activity & Notifications -->
+                    <div class="glass-card">
+                        <h3>Login Activity</h3>
+                        <div class="activity-timeline">
+                            {% for event in security_events %}
+                            <div class="timeline-item">
+                                <div class="timeline-dot {% if 'failed' in event.event_type %}dot-danger{% else %}dot-success{% endif %}"></div>
+                                <div class="timeline-content">
+                                    <strong>{{ event.event_type|title }}</strong>
+                                    <span class="text-muted">{{ event.timestamp|date:"M j, g:i A" }} &bull; {{ event.device_info|default:"Unknown Device" }}</span>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="empty-state">No recent activity.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <h3>Security Notifications</h3>
+                        <form id="security-notifications-form">
+                            <div class="checkbox-group list-group">
+                                <label class="toggle-label">
+                                    <span>New login from unrecognized device</span>
+                                    <input type="checkbox" name="new_login" {% if profile.security_notifications.new_login %}checked{% endif %} class="toggle-input">
+                                    <div class="toggle-switch"></div>
+                                </label>
+                                <label class="toggle-label">
+                                    <span>Password changed</span>
+                                    <input type="checkbox" name="password_changed" {% if profile.security_notifications.password_changed %}checked{% endif %} class="toggle-input">
+                                    <div class="toggle-switch"></div>
+                                </label>
+                                <label class="toggle-label">
+                                    <span>Email address changed</span>
+                                    <input type="checkbox" name="email_changed" {% if profile.security_notifications.email_changed %}checked{% endif %} class="toggle-input">
+                                    <div class="toggle-switch"></div>
+                                </label>
+                                <label class="toggle-label">
+                                    <span>2FA settings changed</span>
+                                    <input type="checkbox" name="2fa_changes" {% if profile.security_notifications.2fa_changes %}checked{% endif %} class="toggle-input">
+                                    <div class="toggle-switch"></div>
+                                </label>
+                                <label class="toggle-label">
+                                    <span>Suspicious login attempts</span>
+                                    <input type="checkbox" name="suspicious_login" {% if profile.security_notifications.suspicious_login %}checked{% endif %} class="toggle-input">
+                                    <div class="toggle-switch"></div>
+                                </label>
+                            </div>
+                            <div class="form-actions" style="margin-top: 24px;">
+                                <button type="submit" class="btn-secondary">Save Preferences</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SECTION: Email -->
+            <section id="email-section" class="dashboard-section">
+                <div class="glass-card">
+                    <h3>Email Address</h3>
+                    <p class="text-muted" style="margin-bottom: 20px;">Current email: <strong id="current-email-display">{{ user.email }}</strong></p>
+                    
+                    <div id="email-change-step-1">
+                        <form id="request-email-form">
+                            <div class="form-group">
+                                <label>New Email Address</label>
+                                <input type="email" id="new_email" name="new_email" required>
+                            </div>
+                            <button type="submit" class="btn-primary">Request Change</button>
+                        </form>
+                    </div>
+
+                    <div id="email-change-step-2" style="display: none; margin-top: 20px;">
+                        <p class="success-text">Verification code sent to your new email.</p>
+                        <form id="verify-email-form">
+                            <div class="form-group">
+                                <label>Enter 6-digit OTP</label>
+                                <input type="text" id="email_otp" name="otp" maxlength="6" pattern="\d{6}" required>
+                            </div>
+                            <button type="submit" class="btn-primary">Verify & Save</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Address Modal (Hidden by default) -->
+    <div id="address-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content glass-card">
+            <h3 id="modal-title">Add New Address</h3>
+            <form id="address-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="addr_full_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" id="addr_phone" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Address Line 1</label>
+                    <input type="text" id="addr_line_1" required>
+                </div>
+                <div class="form-group">
+                    <label>Address Line 2 (Optional)</label>
+                    <input type="text" id="addr_line_2">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" id="addr_city" required>
+                    </div>
+                    <div class="form-group">
+                        <label>State</label>
+                        <input type="text" id="addr_state" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Postal Code</label>
+                        <input type="text" id="addr_postal" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Country</label>
+                        <input type="text" id="addr_country" required>
+                    </div>
+                </div>
+                <div class="form-group checkbox-group" style="flex-direction: row; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="addr_is_default" style="width: auto;">
+                    <label for="addr_is_default" style="margin-bottom: 0;">Set as default address</label>
+                </div>
+                <div class="modal-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button type="button" class="btn-secondary" id="btn-close-modal">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Address</button>
+                </div>
+            </form>
+        </div>
+    <!-- 2FA Setup Modal -->
+    <div id="setup-2fa-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content glass-card" style="text-align: center;">
+            <h3 id="modal-title">Enable Two-Factor Authentication</h3>
+            
+            <div id="setup-2fa-step-1">
+                <p class="text-muted" style="margin-bottom: 20px;">Scan this QR code with your authenticator app (like Google Authenticator, Authy, etc.).</p>
+                <div id="qr-code-container" style="background: white; padding: 16px; border-radius: 8px; display: inline-block; margin-bottom: 20px;">
+                    <img id="qr-code-img" src="" alt="QR Code" style="max-width: 200px; display: block;">
+                </div>
+                <p class="text-muted" style="font-size: 13px; margin-bottom: 20px;">Manual Code: <strong id="manual-secret" style="color: var(--text-primary); letter-spacing: 2px;"></strong></p>
+                
+                <form id="verify-setup-2fa-form">
+                    <div class="form-group">
+                        <label>Enter the 6-digit code</label>
+                        <input type="text" id="setup_2fa_token" class="form-control" placeholder="000000" maxlength="10" required style="text-align: center; letter-spacing: 4px;">
+                    </div>
+                    <div class="modal-actions" style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                        <button type="button" class="btn-secondary btn-close-modal">Cancel</button>
+                        <button type="submit" class="btn-primary">Verify & Enable</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="setup-2fa-step-2" style="display: none;">
+                <h4 style="color: #4caf50; margin-bottom: 16px;">2FA Enabled Successfully!</h4>
+                <p class="text-muted" style="margin-bottom: 20px;">Save these recovery codes in a secure place. You will need them if you lose access to your authenticator app.</p>
+                
+                <div id="recovery-codes-container" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 20px; text-align: left; font-family: monospace; font-size: 16px; letter-spacing: 2px; color: var(--text-primary); margin-bottom: 20px;">
+                </div>
+                
+                <div class="modal-actions" style="margin-top: 20px; display: flex; justify-content: center;">
+                    <button type="button" class="btn-primary" onclick="window.location.reload();">I have saved these codes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Disable 2FA Modal -->
+    <div id="disable-2fa-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content glass-card">
+            <h3>Disable Two-Factor Authentication</h3>
+            <form id="disable-2fa-form">
+                <p class="text-muted" style="margin-bottom: 20px;">Please enter your current password to confirm you want to disable 2FA.</p>
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="disable_2fa_password" required>
+                </div>
+                <div class="modal-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button type="button" class="btn-secondary btn-close-modal">Cancel</button>
+                    <button type="submit" class="btn-primary" style="background: #ff4444;">Disable 2FA</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'js/global.js' %}"></script>
+    <script src="{% static 'js/profile.js' %}"></script>
+</body>
+</html>

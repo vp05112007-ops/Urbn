@@ -1,0 +1,308 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard | URBN{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-surface: #141414;
+            --bg-surface-hover: #1f1f1f;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --accent: #ffffff;
+            --border: #222222;
+            --sidebar-width: 260px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .sidebar-header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .sidebar-nav {
+            flex-grow: 1;
+            padding: 16px 0;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--bg-surface-hover);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            border-left: 3px solid var(--accent);
+            padding-left: 21px;
+        }
+
+        .sidebar-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .sidebar-footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-footer a:hover {
+            color: var(--text-main);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 70px;
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+        }
+
+        .topbar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .content-area {
+            padding: 32px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        /* Common UI Elements */
+        .card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .btn-primary {
+            background-color: var(--text-main);
+            color: var(--bg-dark);
+        }
+        
+        .btn-primary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border-color: var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--bg-surface-hover);
+            border-color: var(--text-muted);
+        }
+
+        /* Table Styles */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-success { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+        .badge-warning { background: rgba(241, 196, 15, 0.1); color: #f1c40f; }
+        .badge-danger { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+        .badge-info { background: rgba(52, 152, 219, 0.1); color: #3498db; }
+        
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>URBN ADMIN</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'admin_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{% url 'admin_orders' %}" class="nav-item {% if 'admin_order' in request.resolver_match.url_name %}active{% endif %}">Orders</a>
+            <a href="{% url 'admin_products' %}" class="nav-item {% if 'admin_product' in request.resolver_match.url_name %}active{% endif %}">Products</a>
+            <a href="{% url 'admin_inventory' %}" class="nav-item {% if 'admin_inventory' in request.resolver_match.url_name %}active{% endif %}">Inventory</a>
+            <a href="{% url 'admin_collections' %}" class="nav-item {% if 'admin_collection' in request.resolver_match.url_name %}active{% endif %}">Collections</a>
+            <a href="{% url 'admin_categories' %}" class="nav-item {% if 'admin_category' in request.resolver_match.url_name %}active{% endif %}">Categories</a>
+            <a href="{% url 'admin_users' %}" class="nav-item {% if 'admin_user' in request.resolver_match.url_name %}active{% endif %}">Customers</a>
+            <a href="{% url 'admin_returns' %}" class="nav-item {% if 'admin_return' in request.resolver_match.url_name %}active{% endif %}">Returns & Exchanges</a>
+            <a href="{% url 'admin_refunds' %}" class="nav-item {% if 'admin_refund' in request.resolver_match.url_name %}active{% endif %}">Refunds</a>
+            <a href="javascript:void(0)" class="nav-item">Reviews</a>
+            <a href="{% url 'admin_analytics' %}" class="nav-item {% if 'admin_analytics' in request.resolver_match.url_name %}active{% endif %}">Analytics</a>
+            <a href="{% url 'admin_settings' %}" class="nav-item {% if 'admin_settings' in request.resolver_match.url_name %}active{% endif %}">Settings</a>
+        </nav>
+        <div class="sidebar-footer" style="padding-top: 16px; border-top: 1px solid var(--border);">
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">{{ request.user.email }}</div>
+            <a href="{% url 'logout_session' %}" class="nav-item" style="color: #e74c3c;">Logout</a>
+            <a href="{% url 'home' %}" style="display: block; margin-top: 16px; color: var(--text-muted); text-decoration: none;">&larr; Back to Store</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-title">
+                {% block page_title %}Dashboard{% endblock %}
+            </div>
+            <div class="topbar-actions">
+                <div class="user-profile" style="display: flex; align-items: center; gap: 12px;">
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600; font-size: 0.9rem;">URBN Admin</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">{{ request.user.email }}</div>
+                    </div>
+                    {% if request.user.profile.profile_photo %}
+                        <img src="{{ request.user.profile.profile_photo.url }}" alt="Admin Avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                    {% else %}
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                            {{ request.user.email|make_list|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="card" style="padding: 12px 24px; margin-bottom: 24px; border-color: {% if message.tags == 'error' %}#e74c3c{% else %}#2ecc71{% endif %};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

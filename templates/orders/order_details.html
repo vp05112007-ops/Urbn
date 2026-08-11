@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details | URBN</title>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+</head>
+<body class="inner-page orders-page">
+
+    {% include 'partials/navbar.html' %}
+
+    <main class="page-content">
+        <div class="orders-container">
+            
+            <a href="{% url 'my_orders' %}" class="back-link">← Back to My Orders</a>
+
+            <div class="order-details-card">
+                <header class="details-header">
+                    <div class="header-main">
+                        <h1>ORDER DETAILS</h1>
+                        <p class="order-number">Order #{{ order.order_number }}</p>
+                    </div>
+                    <div class="header-meta">
+                        <p><strong>Order Date:</strong> {{ order.created_at|date:"d M Y, h:i A" }}</p>
+                        <p><strong>Payment Status:</strong> <span class="badge {{ order.payment_status|lower }}">{{ order.payment_status }}</span></p>
+                        <p><strong>Order Status:</strong> <span class="badge {{ order.order_status|lower }}">{{ order.get_order_status_display }}</span></p>
+                    </div>
+                </header>
+
+                <section class="details-section">
+                    <h2>ITEMS</h2>
+                    <div class="items-list">
+                        {% for item in items %}
+                        <div class="item-row">
+                            <div class="item-image" style="background-image: url('{{ item.product_image_snapshot|default:'' }}');"></div>
+                            <div class="item-info">
+                                <h3>{{ item.product_name_snapshot }}</h3>
+                                <p>Size: {{ item.size|default:'Free Size' }} | Color: {{ item.color|default:'Default' }}</p>
+                                {% if item.custom_text %}
+                                <p class="customization">Custom: "{{ item.custom_text }}" ({{ item.placement }})</p>
+                                {% endif %}
+                            </div>
+                            <div class="item-qty">
+                                Qty: {{ item.quantity }}
+                            </div>
+                            <div class="item-price">
+                                ₹{{ item.subtotal }}
+                            </div>
+                            {% if order.order_status == 'DELIVERED' %}
+                            <div class="item-actions" style="display: flex; flex-direction: column; gap: 5px; margin-left: auto;">
+                                <a href="{% url 'create_return_request' order.order_number item.id %}?type=RETURN" class="urbn-btn outline" style="padding: 6px 12px; font-size: 11px;">RETURN</a>
+                                <a href="{% url 'create_return_request' order.order_number item.id %}?type=EXCHANGE" class="urbn-btn outline" style="padding: 6px 12px; font-size: 11px;">EXCHANGE</a>
+                                <a href="{% url 'create_return_request' order.order_number item.id %}?type=REPLACEMENT" class="urbn-btn outline" style="padding: 6px 12px; font-size: 11px;">REPLACEMENT</a>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <div class="details-grid">
+                    <section class="details-section">
+                        <h2>DELIVERY ADDRESS</h2>
+                        <div class="address-box">
+                            <p><strong>{{ order.first_name }} {{ order.last_name }}</strong></p>
+                            <p>{{ order.email }}</p>
+                            <p>{{ order.phone }}</p>
+                            <p>{{ order.address_line_1 }}</p>
+                            {% if order.address_line_2 %}<p>{{ order.address_line_2 }}</p>{% endif %}
+                            <p>{{ order.city }}, {{ order.state }} - {{ order.pincode }}</p>
+                            <p>{{ order.country }}</p>
+                        </div>
+                    </section>
+
+                    <section class="details-section">
+                        <h2>PAYMENT</h2>
+                        <div class="payment-box">
+                            <p><strong>Method:</strong> Razorpay</p>
+                            <p><strong>Status:</strong> {{ order.payment_status }}</p>
+                            <p><strong>Transaction ID:</strong> {{ order.razorpay_payment_id|default:'N/A' }}</p>
+                        </div>
+                    </section>
+                </div>
+
+                <section class="details-section">
+                    <h2>PRICE SUMMARY</h2>
+                    <div class="price-summary-box">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span>₹{{ order.subtotal }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span>{% if order.shipping_charge == 0 %}FREE{% else %}₹{{ order.shipping_charge }}{% endif %}</span>
+                        </div>
+                        {% if order.discount > 0 %}
+                        <div class="summary-row">
+                            <span>Discount</span>
+                            <span>-₹{{ order.discount }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="summary-row total">
+                            <span>TOTAL</span>
+                            <span>₹{{ order.total_amount }}</span>
+                        </div>
+                    </div>
+                </section>
+
+                <footer class="details-footer" style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <a href="{% url 'order_tracking' order.order_number %}" class="urbn-btn primary">TRACK ORDER</a>
+                    
+                    {% if order.payment_status == 'PAID' %}
+                    <a href="{% url 'download_invoice' order.order_number %}" class="urbn-btn outline">DOWNLOAD INVOICE</a>
+                    <form action="{% url 'resend_invoice' order.order_number %}" method="POST" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="urbn-btn outline">RESEND INVOICE</button>
+                    </form>
+                    {% endif %}
+
+                    {% if order.order_status == 'PLACED' or order.order_status == 'PAYMENT_CONFIRMED' %}
+                    <button class="urbn-btn outline cancel-btn" disabled>CANCEL ORDER</button>
+                    {% endif %}
+                </footer>
+            </div>
+        </div>
+    </main>
+    
+    {% if messages %}
+    <div class="messages" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}" style="background: #111; border: 1px solid #333; color: white; padding: 15px; margin-top: 10px; border-radius: 4px;">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</body>
+</html>

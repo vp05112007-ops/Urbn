@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Details | URBN</title>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+    <style>
+        .details-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 768px) {
+            .details-grid { grid-template-columns: 1fr; }
+        }
+        .images-grid {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .uploaded-image {
+            width: 100px;
+            height: 100px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+        }
+        .info-block {
+            background: rgba(255,255,255,0.03);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .info-block p {
+            margin: 8px 0;
+            color: #ccc;
+        }
+        .info-block strong {
+            color: #fff;
+        }
+        /* Vertical Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 20px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255,255,255,0.1);
+        }
+        .timeline-step {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .timeline-step::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #121212;
+            border: 2px solid rgba(255,255,255,0.5);
+            z-index: 1;
+        }
+        .timeline-step.active::before {
+            background: #fff;
+            border-color: #fff;
+        }
+        .timeline-content h4 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .timeline-content p {
+            margin: 0;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body class="inner-page orders-page">
+
+    {% include 'partials/navbar.html' %}
+
+    <main class="page-content">
+        <div class="orders-container">
+            
+            <a href="{% url 'return_requests_list' %}" class="back-link">← Back to My Returns</a>
+
+            <div class="order-details-card" style="margin-top: 20px;">
+                <header class="details-header">
+                    <div class="header-main">
+                        <h1>REQUEST DETAILS</h1>
+                        <p class="order-number">Request #{{ return_req.request_number }}</p>
+                    </div>
+                    <div class="header-meta">
+                        <p><strong>Date:</strong> {{ return_req.created_at|date:"d M Y" }}</p>
+                        <p><strong>Type:</strong> <span class="badge" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">{{ return_req.get_request_type_display }}</span></p>
+                        <p><strong>Status:</strong> <span class="badge" style="background: #fff; color: #000;">{{ return_req.get_status_display }}</span></p>
+                    </div>
+                </header>
+
+                <div class="details-grid">
+                    <div class="left-col">
+                        <section class="details-section">
+                            <h2>PRODUCT INFO</h2>
+                            <div class="item-row" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px;">
+                                <div class="item-image" style="background-image: url('{{ return_req.order_item.product_image_snapshot|default:'' }}'); width: 80px; height: 80px;"></div>
+                                <div class="item-info">
+                                    <h3>{{ return_req.order_item.product_name_snapshot }}</h3>
+                                    <p>Original Size: {{ return_req.order_item.size|default:'Free Size' }}</p>
+                                    <p>Qty Requested: {{ return_req.requested_quantity }}</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="details-section">
+                            <h2>REQUEST INFO</h2>
+                            <div class="info-block">
+                                <p><strong>Reason:</strong> {{ return_req.reason }}</p>
+                                <p><strong>Description:</strong> {{ return_req.description }}</p>
+                                
+                                {% if return_req.request_type == 'EXCHANGE' %}
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1);">
+                                    <p><strong>Requested Size:</strong> {{ return_req.requested_exchange_size|default:"N/A" }}</p>
+                                    <p><strong>Requested Color:</strong> {{ return_req.requested_exchange_color|default:"N/A" }}</p>
+                                </div>
+                                {% endif %}
+                                
+                                {% if return_req.status == 'REJECTED' %}
+                                <div style="margin-top: 15px; padding: 15px; background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3); border-radius: 4px;">
+                                    <p style="color: #ffcccc; margin: 0;"><strong>Rejection Reason:</strong> {{ return_req.rejection_reason }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        {% if images %}
+                        <section class="details-section">
+                            <h2>UPLOADED EVIDENCE</h2>
+                            <div class="images-grid">
+                                {% for img in images %}
+                                <a href="{{ img.image.url }}" target="_blank">
+                                    <div class="uploaded-image" style="background-image: url('{{ img.image.url }}');"></div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </section>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="right-col">
+                        <section class="details-section">
+                            <h2>TIMELINE</h2>
+                            <div class="timeline">
+                                {% for event in history %}
+                                <div class="timeline-step {% if forloop.first %}active{% endif %}">
+                                    <div class="timeline-content">
+                                        <h4>{{ event.get_status_display }}</h4>
+                                        <p>{{ event.created_at|date:"d M Y, h:i A" }}</p>
+                                        {% if event.note %}<p style="margin-top: 5px; font-style: italic;">{{ event.note }}</p>{% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Returns | URBN</title>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+</head>
+<body class="inner-page orders-page">
+
+    {% include 'partials/navbar.html' %}
+
+    <main class="page-content">
+        <div class="orders-container">
+            
+            <header class="orders-header">
+                <h1>MY RETURNS & EXCHANGES</h1>
+                <p>Manage your return, exchange, and replacement requests.</p>
+            </header>
+
+            {% if messages %}
+            <div class="messages" style="margin-bottom: 20px;">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}" style="background: rgba(255,255,255,0.1); border-left: 4px solid #fff; padding: 15px; border-radius: 4px; color: #fff;">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if requests %}
+            <div class="orders-list">
+                {% for req in requests %}
+                <div class="order-card" style="margin-bottom: 20px;">
+                    <div class="order-header">
+                        <div class="header-left">
+                            <span class="order-number">Request #{{ req.request_number }}</span>
+                            <span class="order-date">{{ req.created_at|date:"d M Y" }}</span>
+                        </div>
+                        <div class="header-right">
+                            <span class="badge" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">{{ req.get_request_type_display }}</span>
+                            <span class="badge" style="background: #fff; color: #000;">{{ req.get_status_display }}</span>
+                        </div>
+                    </div>
+                    <div class="order-card-body">
+                        <div class="order-items-preview">
+                            <div class="order-item-mini">
+                                <div class="item-img" style="background-image: url('{{ req.order_item.product_image_snapshot|default:'' }}');"></div>
+                                <div class="item-info">
+                                    <div class="name">{{ req.order_item.product_name_snapshot }}</div>
+                                    <div class="meta">Qty: {{ req.requested_quantity }} • Reason: {{ req.reason }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="order-summary-block">
+                            <div class="total-label" style="font-size: 11px; text-transform: uppercase; color: #888;">Original Order</div>
+                            <div class="total-amount" style="font-size: 14px;">#{{ req.order.order_number }}</div>
+                        </div>
+                    </div>
+
+                    <div class="order-card-actions">
+                        <a href="{% url 'return_request_detail' req.request_number %}" class="urbn-btn primary">VIEW REQUEST</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>You have no return or exchange requests.</p>
+                <a href="{% url 'my_orders' %}" class="urbn-btn outline" style="margin-top: 20px; display: inline-block;">VIEW ORDERS</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

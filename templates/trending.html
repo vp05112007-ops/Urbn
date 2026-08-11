@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URBN | Trending</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/trending.css' %}">
+</head>
+<body class="inner-page trending-page">
+
+    {% include 'partials/navbar.html' %}
+
+    <main class="page-content">
+        <header class="trending-hero reveal-on-scroll">
+            <h1>TRENDING NOW</h1>
+            <p>The pieces everyone is talking about. Discover the most sought-after styles in streetwear right now.</p>
+        </header>
+        <!-- Best Sellers -->
+        <section class="trending-section">
+            <div class="section-header reveal-on-scroll">
+                <h2>BEST SELLERS</h2>
+                <a href="{% url 'categories' %}" class="view-all">View All &rarr;</a>
+            </div>
+            <div class="product-grid">
+                {% for p in best_sellers %}
+                <div class="product-card reveal-on-scroll" data-id="{{ p.sku }}" data-name="{{ p.name }}" data-price="{{ p.price }}" data-image="{{ p.primary_image_url }}">
+                    <div class="product-image-wrap">
+                        <img src="{{ p.primary_image_url|default:'/static/images/placeholder.png' }}" alt="{{ p.name }}" onerror="this.src='/static/images/placeholder.png';" style="width:100%; height:100%; object-fit: cover;">
+                        <div class="wishlist-btn" data-id="{{ p.sku }}">&#9825;</div>
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">{{ p.category.name|upper }}</span>
+                        <span class="product-name">{{ p.name }}</span>
+                        <div class="product-price-row">
+                            <span class="product-price">₹{{ p.price|floatformat:"0" }}</span>
+                            <button class="add-to-cart-btn">ADD TO CART</button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No trending items right now.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- New Arrivals -->
+        <section class="trending-section">
+            <div class="section-header reveal-on-scroll">
+                <h2>NEW ARRIVALS</h2>
+                <a href="{% url 'categories' %}" class="view-all">View All &rarr;</a>
+            </div>
+            <div class="product-grid">
+                {% for p in new_arrivals %}
+                <div class="product-card reveal-on-scroll" data-id="{{ p.sku }}" data-name="{{ p.name }}" data-price="{{ p.price }}" data-image="{{ p.primary_image_url }}">
+                    <div class="product-image-wrap">
+                        <img src="{{ p.primary_image_url|default:'/static/images/placeholder.png' }}" alt="{{ p.name }}" onerror="this.src='/static/images/placeholder.png';" style="width:100%; height:100%; object-fit: cover;">
+                        <div class="wishlist-btn" data-id="{{ p.sku }}">&#9825;</div>
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">{{ p.category.name|upper }}</span>
+                        <span class="product-name">{{ p.name }}</span>
+                        <div class="product-price-row">
+                            <span class="product-price">₹{{ p.price|floatformat:"0" }}</span>
+                            <button class="add-to-cart-btn">ADD TO CART</button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No new arrivals at the moment.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <script src="{% static 'js/global.js' %}"></script>
+    <script src="{% static 'js/trending.js' %}"></script>
+    {% include 'partials/cart_drawer.html' %}
+</body>
+</html>

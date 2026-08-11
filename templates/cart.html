@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>URBN | Bag</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+    <!-- Include Razorpay Checkout JS -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <div id="checkout-config"
+         data-create-payment-url="{% url 'create_razorpay_order' %}"
+         data-payment-success-url="{% url 'payment_success' %}">
+    </div>
+</head>
+<body>
+
+    {% include 'partials/navbar.html' %}
+
+    <main class="cart-container">
+        
+        <div class="cart-layout">
+            <!-- Left Side: Items -->
+            <div class="cart-items-section">
+                <div class="cart-header">
+                    <h1>YOUR BAG</h1>
+                    <p class="cart-item-count"><span id="header-item-count">0</span> ITEMS</p>
+                </div>
+
+                <div id="cart-empty" class="cart-empty" style="display: none;">
+                    <h2>YOUR BAG IS EMPTY</h2>
+                    <p>Looks like you haven't added anything yet.</p>
+                    <a href="{% url 'collections' %}" class="urbn-btn primary-btn">EXPLORE COLLECTION</a>
+                </div>
+                
+                <div id="cart-items-list">
+                    <!-- Items rendered via JS -->
+                </div>
+            </div>
+
+            <!-- Right Side: Summary -->
+            <div class="cart-summary-section">
+                <div class="summary-card sticky-summary">
+                    <h2>ORDER SUMMARY</h2>
+                    <div class="summary-details">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal">₹0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span id="shipping">FREE</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Discount</span>
+                            <span id="discount">₹0</span>
+                        </div>
+                        <hr class="summary-divider">
+                        <div class="summary-row total">
+                            <span>TOTAL</span>
+                            <span id="total">₹0</span>
+                        </div>
+                    </div>
+                    
+                    <button class="urbn-btn primary-btn checkout-btn" id="btn-proceed-checkout">PROCEED TO CHECKOUT</button>
+                    <a href="{% url 'home' %}" class="urbn-btn secondary-btn">CONTINUE SHOPPING</a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="{% static 'js/global.js' %}"></script>
+    <script src="{% static 'js/cart.js' %}"></script>
+</body>
+</html>

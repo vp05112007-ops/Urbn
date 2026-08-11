@@ -1,0 +1,83 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Orders | URBN Admin{% endblock %}
+{% block page_title %}Orders Management{% endblock %}
+
+{% block content %}
+<div class="card" style="display: flex; gap: 16px; margin-bottom: 24px; padding: 16px 24px;">
+    <form method="GET" style="display: flex; gap: 16px; align-items: center;">
+        <div>
+            <label style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Status</label>
+            <select name="status" style="background: var(--bg-dark); color: white; border: 1px solid var(--border); padding: 8px; border-radius: 4px;">
+                <option value="">All Statuses</option>
+                <option value="PLACED" {% if request.GET.status == 'PLACED' %}selected{% endif %}>PLACED</option>
+                <option value="PAYMENT_CONFIRMED" {% if request.GET.status == 'PAYMENT_CONFIRMED' %}selected{% endif %}>PAYMENT_CONFIRMED</option>
+                <option value="CONFIRMED" {% if request.GET.status == 'CONFIRMED' %}selected{% endif %}>CONFIRMED</option>
+                <option value="PACKED" {% if request.GET.status == 'PACKED' %}selected{% endif %}>PACKED</option>
+                <option value="SHIPPED" {% if request.GET.status == 'SHIPPED' %}selected{% endif %}>SHIPPED</option>
+                <option value="OUT_FOR_DELIVERY" {% if request.GET.status == 'OUT_FOR_DELIVERY' %}selected{% endif %}>OUT_FOR_DELIVERY</option>
+                <option value="DELIVERED" {% if request.GET.status == 'DELIVERED' %}selected{% endif %}>DELIVERED</option>
+                <option value="CANCELLED" {% if request.GET.status == 'CANCELLED' %}selected{% endif %}>CANCELLED</option>
+            </select>
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Payment</label>
+            <select name="payment" style="background: var(--bg-dark); color: white; border: 1px solid var(--border); padding: 8px; border-radius: 4px;">
+                <option value="">All Payments</option>
+                <option value="PENDING" {% if request.GET.payment == 'PENDING' %}selected{% endif %}>PENDING</option>
+                <option value="PAID" {% if request.GET.payment == 'PAID' %}selected{% endif %}>PAID</option>
+                <option value="FAILED" {% if request.GET.payment == 'FAILED' %}selected{% endif %}>FAILED</option>
+                <option value="REFUNDED" {% if request.GET.payment == 'REFUNDED' %}selected{% endif %}>REFUNDED</option>
+            </select>
+        </div>
+        <div style="margin-top: 18px;">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{% url 'admin_orders' %}" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.order_number }}</td>
+                    <td>{{ order.created_at|date:"M d, Y, h:i A" }}</td>
+                    <td>{{ order.user.email }}</td>
+                    <td>
+                        <span class="badge {% if order.status == 'DELIVERED' %}badge-success{% elif order.status == 'CANCELLED' %}badge-danger{% else %}badge-info{% endif %}">
+                            {{ order.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {% if order.payment_status == 'PAID' %}badge-success{% elif order.payment_status == 'FAILED' %}badge-danger{% elif order.payment_status == 'REFUNDED' %}badge-warning{% else %}badge-info{% endif %}">
+                            {{ order.payment_status }}
+                        </span>
+                    </td>
+                    <td>₹{{ order.total_price|floatformat:"2" }}</td>
+                    <td><a href="{% url 'admin_order_detail' order.order_number %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;">View</a></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">No orders found matching the criteria.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
